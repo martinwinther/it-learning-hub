@@ -43,6 +43,14 @@ print(None)       # represents 'no value' or 'null'
 # Operators are special symbols or keywords that perform operations on values.
 
 # Arithmetic operators
+# Unary operators (operate on a single operand)
+print(-5)   # unary minus, changes the sign
+print(+3)   # unary plus, usually leaves the value unchanged
+
+# Binary operators (operate on two operands)
+print(4 + 5)   # addition
+print(12 % 5)  # modulus
+
 print(5 + 3)   # addition
 print(5 - 3)   # subtraction
 print(5 * 3)   # multiplication
@@ -77,18 +85,21 @@ print(100)
 print(10 - 4 / 2)  # division happens before subtraction
 
 # --- Operator Precedence ---
-# Python follows standard mathematical rules for the order of operations:
+# Python follows a specific hierarchy of priorities:
 # 1. Parentheses ()
-# 2. Exponentiation **
-# 3. Multiplication, Division, Floor Division, Modulo (*, /, //, %)
-# 4. Addition and Subtraction (+, -)
-# 5. Comparisons (==, !=, <, >, <=, >=)
-# 6. Logical NOT
-# 7. Logical AND
-# 8. Logical OR
+# 2. Exponentiation ** (right-sided binding)
+# 3. Unary + and - (when applied to a single operand)
+# 4. Multiplication, Division, Floor Division, Modulo (*, /, //, %)
+# 5. Addition and Subtraction (+, -)
+# 6. Comparisons (==, !=, <, >, <=, >=)
+# 7. Logical NOT
+# 8. Logical AND
+# 9. Logical OR
 
 print(2 + 3 * 4)      # Multiplication happens before addition → 14
 print((2 + 3) * 4)    # Parentheses change the order → 20
+# Right-sided binding of exponentiation
+print(2 ** 2 ** 3)  # interpreted as 2 ** (2 ** 3) -> 2 ** 8 -> 256
 
 # --- Common Mistakes ---
 # Mixing types without understanding conversions
