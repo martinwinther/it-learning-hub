@@ -2,28 +2,38 @@
 
 ## Overview
 
-Python is a widely used, interpreted, object-oriented, and high-level programming language with dynamic semantics, designed for general-purpose programming. Its focus on readability, simplicity, and rapid development has made it one of the most popular languages for both beginners and professionals.
+Python is a widely used, interpreted, object-oriented, and high-level programming
+language with dynamic semantics, designed for general-purpose programming. Its
+focus on readability, simplicity, and rapid development has made it one of the
+most popular languages for both beginners and professionals.
 
-The name “Python” comes not from the snake, but from the BBC comedy series *Monty Python’s Flying Circus*, a favorite of its creator, Guido van Rossum.
+The name "Python" comes not from the snake, but from the BBC comedy series
+*Monty Python's Flying Circus*, a favorite of its creator, Guido van Rossum.
 
 ## History and Origins
 
 ### Creator
+
 - **Guido van Rossum**, born in 1956 in Haarlem, Netherlands.
-- Began work on Python in December 1989 as a personal hobby project during Christmas break.
-- Inspired by the ABC language, aiming to create a language appealing to Unix/C developers.
+- Began work on Python in December 1989 as a personal hobby project during
+  Christmas break.
+- Inspired by the ABC language, aiming to create a language appealing to Unix/C
+  developers.
 
 ### Early Goals (1999)
+
 - Easy and intuitive, yet powerful.
 - Open source — anyone can contribute.
 - Code as readable as plain English.
 - Suitable for everyday tasks, enabling short development times.
 
-More than 20 years later, Python has met these goals, ranking consistently among the top programming languages worldwide.
+More than 20 years later, Python has met these goals, ranking consistently among
+the top programming languages worldwide.
 
 ## Why Python Is Special
 
 ### Key Strengths
+
 - **Easy to learn**: Shorter time to productivity compared to many languages.
 - **Easy to teach**: Focus on general programming concepts over obscure syntax.
 - **Efficient to write**: Faster code creation and modification.
@@ -31,60 +41,78 @@ More than 20 years later, Python has met these goals, ranking consistently among
 - **Accessible**: Free, open source, and available on all major platforms.
 
 ### Common Uses
+
 - Web services (search engines, cloud platforms, social media).
 - Software development tools.
 - Scientific computing.
 - Test automation.
 
 ### Limitations
-- Low-level system programming (“close to metal” work).
+
+- Low-level system programming ("close to metal" work).
 - Mobile application development (limited but growing presence).
 
 ## Rivals
+
 - **Perl** – Traditional, conservative scripting language.
 - **Ruby** – Innovative, feature-rich scripting language.
-Python’s design philosophy lies between Perl’s conservatism and Ruby’s innovation.
+
+Python's design philosophy lies between Perl's conservatism and Ruby's innovation.
 
 ## Python 2 vs Python 3
 
 ### Python 2
+
 - Older branch; development frozen for new features.
 - Still maintained for bug fixes and security patches.
 - Widely used in legacy systems.
 
 ### Python 3
+
 - Current and actively developed branch.
 - Not backward compatible with Python 2.
 - All new projects should use Python 3.
-- Newer versions of Python 3 are backward compatible with previous Python 3 releases.
+- Newer versions of Python 3 are backward compatible with previous Python 3
+  releases.
 
 ## Implementations
 
 ### CPython
-- The **reference implementation**, maintained by the Python Software Foundation (PSF).
+
+- The **reference implementation**, maintained by the Python Software Foundation
+  (PSF).
 - Written in C for portability to virtually all platforms.
 
 ### Cython
-- Translates Python code into C for improved performance, useful for computationally heavy tasks.
+
+- Translates Python code into C for improved performance, useful for
+  computationally heavy tasks.
 
 ### Jython
+
 - Written in Java, integrates Python with Java environments.
 - Currently aligned with Python 2 standards.
 
 ### PyPy
+
 - Implemented in RPython (a subset of Python).
 - Compiles to C for execution.
 - Useful for testing new language features.
 - Compatible with Python 3.
 
 ### MicroPython
+
 - Lightweight Python 3 implementation for microcontrollers.
 - Created by Damien George in 2013.
-- Includes CircuitPython, a derivative optimized for beginner-friendly embedded development.
+- Includes CircuitPython, a derivative optimized for beginner-friendly embedded
+  development.
 
 ## Summary
-- **Python** is an interpreted, object-oriented, high-level, general-purpose language.
-- Created by **Guido van Rossum** in 1989, inspired by the ABC language and named after *Monty Python’s Flying Circus*.
+
+- **Python** is an interpreted, object-oriented, high-level, general-purpose
+  language.
+- Created by **Guido van Rossum** in 1989, inspired by the ABC language and
+  named after *Monty Python's Flying Circus*.
 - Known for readability, ease of use, and versatility across domains.
 - Available in multiple implementations, with **CPython** as the standard.
 - Python 3 is the modern standard; Python 2 remains for legacy support.

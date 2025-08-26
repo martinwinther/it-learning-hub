@@ -2,14 +2,20 @@
 
 ## Overview
 
-Programming is the process of creating a precise set of instructions that a computer can execute to perform a specific task. These instructions are written in a programming language and executed to solve problems, process data, or automate operations. 
+Programming is the process of creating a precise set of instructions that a
+computer can execute to perform a specific task. These instructions are written
+in a programming language and executed to solve problems, process data, or
+automate operations.
 
-It is a way for humans to communicate with computers in an exact, structured manner, turning ideas into **clear, unambiguous operations**.
+It is a way for humans to communicate with computers in an exact, structured
+manner, turning ideas into **clear, unambiguous operations**.
 
 ## Key Concepts
 
 ### What is a Program?
-- **Definition**: A sequence of instructions that tells a computer what to do, step-by-step.
+
+- **Definition**: A sequence of instructions that tells a computer what to do,
+  step-by-step.
 - **Purpose**: Enables computers to perform tasks automatically and repeatably.
 - **Examples**:
   - Web browsers
@@ -19,18 +25,28 @@ It is a way for humans to communicate with computers in an exact, structured man
   - Data analysis scripts
 
 ### Programming Languages
-- **Definition**: Formal languages with strict rules for writing computer instructions.
+
+- **Definition**: Formal languages with strict rules for writing computer
+  instructions.
 - **Categories**:
-  - **Low-level languages** (e.g., Assembly) – close to machine code, harder for humans to read, highly hardware-specific.
-  - **High-level languages** (e.g., Python, Java) – more abstract, easier for humans to read and write.
-- **Real-World Use**: Choice of language depends on project requirements, performance needs, and developer expertise.
+  - **Low-level languages** (e.g., Assembly) – close to machine code, harder for
+    humans to read, highly hardware-specific.
+  - **High-level languages** (e.g., Python, Java) – more abstract, easier for
+    humans to read and write.
+- **Real-World Use**: Choice of language depends on project requirements,
+  performance needs, and developer expertise.
 
 #### Natural vs. Programming Languages
-- **Natural Languages**: Human languages (e.g., English, Danish) — flexible but ambiguous.
-- **Programming Languages**: Formal, precise, unambiguous — every instruction has a single defined meaning.
-- **Key Difference**: Computers cannot interpret ambiguity; programming requires exact syntax and structure.
+
+- **Natural Languages**: Human languages (e.g., English, Danish) — flexible but
+  ambiguous.
+- **Programming Languages**: Formal, precise, unambiguous — every instruction
+  has a single defined meaning.
+- **Key Difference**: Computers cannot interpret ambiguity; programming requires
+  exact syntax and structure.
 
 #### Compilation vs. Interpretation
+
 - **Compilation**:
   - Translates the entire source code into machine code before execution.
   - Produces a standalone executable.
@@ -42,28 +58,36 @@ It is a way for humans to communicate with computers in an exact, structured man
   - Example: Python, JavaScript
   - **Pros**: Easier debugging, no separate compilation step.
   - **Cons**: Slower execution compared to compiled code.
-- **Hybrid Models**: Some languages use both (e.g., Java compiles to bytecode, then interprets within a virtual machine).
+- **Hybrid Models**: Some languages use both (e.g., Java compiles to bytecode,
+  then interprets within a virtual machine).
 
 ### The Role of the Programmer
+
 - **Design**: Break down problems into solvable steps.
 - **Write**: Use correct syntax and language features to implement the solution.
 - **Test**: Verify correctness and handle errors.
 - **Maintain**: Update and improve the program as needs change.
 
 ### Why Programming Matters
+
 - **Automation**: Removes repetitive manual work.
 - **Scalability**: Handles tasks faster and more accurately than humans.
 - **Innovation**: Enables the creation of entirely new tools and products.
 - **Problem-Solving**: Converts abstract problems into actionable solutions.
 
 ## Real-World Applications
+
 - **Business**: Automating workflows, managing databases.
 - **Science**: Data analysis, experiment simulation.
 - **Entertainment**: Game and media development.
 - **Everyday Life**: Smart devices, personal finance tools.
 
 ## Summary
-- Programming is **the act of instructing computers** using precise, formal languages.
+
+- Programming is **the act of instructing computers** using precise, formal
+  languages.
 - Programs range from small scripts to complex software systems.
-- Understanding **natural vs. programming languages** and **compilation vs. interpretation** is essential.
-- Programmers combine logical thinking with technical skill to create solutions that impact nearly every industry.
+- Understanding **natural vs. programming languages** and **compilation vs.
+  interpretation** is essential.
+- Programmers combine logical thinking with technical skill to create solutions
+  that impact nearly every industry.
