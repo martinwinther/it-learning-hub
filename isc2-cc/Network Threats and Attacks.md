@@ -2,25 +2,32 @@
 
 ## Overview
 
-Network threats and attacks represent significant risks to organizational security and data integrity. Understanding these threats is essential for cybersecurity professionals to implement appropriate defenses and respond effectively to security incidents.
+Network threats and attacks represent significant risks to organizational security
+and data integrity. Understanding these threats is essential for cybersecurity
+professionals to implement appropriate defenses and respond effectively to security
+incidents.
 
 ## Malware
 
 ### Definition and Components
 
-Malware infects computers and performs some kind of evil action. Malware consists of two main parts:
+Malware infects computers and performs some kind of evil action. Malware consists
+of two main parts:
 
 - **Propagation Mechanism**: How the malware spreads from one system to another
 - **Payload**: The malicious action it performs
 
 ### Malware Types and Propagation Methods
 
-Different malware objects spread in different ways. Viruses spread between systems after a user action; worms spread under their own power; and Trojan horses pose as beneficial software with a hidden malicious effect.
+Different malware objects spread in different ways. Viruses spread between systems
+after a user action; worms spread under their own power; and Trojan horses pose as
+beneficial software with a hidden malicious effect.
 
 #### Viruses
 
 - **Propagation**: Spread from system to system based on user action
-- **Examples**: Opening infected email attachments, infected USB drives, visiting malicious websites
+- **Examples**: Opening infected email attachments, infected USB drives, visiting
+  malicious websites
 - **Characteristics**: Does not spread unless triggered by user action
 - **Best Defense**: User awareness and education
 - **Prevention**: Antivirus software, user training, email filtering
@@ -37,7 +44,8 @@ Different malware objects spread in different ways. Viruses spread between syste
 
 - **Propagation**: Pretends to be legitimate software
 - **Characteristics**: Software works like normal but also contains malicious code
-- **Examples**: Fake software updates, malicious applications, compromised downloads
+- **Examples**: Fake software updates, malicious applications, compromised
+  downloads
 - **Best Defense**: Application control and whitelisting
 - **Prevention**: Code signing, application allowlisting, user education
 
@@ -51,17 +59,23 @@ Different malware objects spread in different ways. Viruses spread between syste
 
 ## Eavesdropping Attacks
 
-### Overview
+### Eavesdropping Overview
 
-Eavesdropping attacks require some compromise of the communication path between a client and server. These are on-path attacks that intercept communications.
+Eavesdropping attacks require some compromise of the communication path between a
+client and server. These are on-path attacks that intercept communications.
 
 ### Man-in-the-Middle (MitM) Attacks
 
-In a man-in-the-middle (MitM) attack, the attacker tricks the sending system into communicating with the attacker, rather than the intended server. The user authenticates to the fake server set up by the attacker, and the attacker acts as a relay and can view all of the communications that take place between the client and the server.
+In a man-in-the-middle (MitM) attack, the attacker tricks the sending system into
+communicating with the attacker, rather than the intended server. The user
+authenticates to the fake server set up by the attacker, and the attacker acts as
+a relay and can view all of the communications that take place between the client
+and the server.
 
 #### MitM Attack Methods
 
-- **Network Device Reconfiguration**: Compromising routers, switches, or other network equipment
+- **Network Device Reconfiguration**: Compromising routers, switches, or other
+  network equipment
 - **DNS Poisoning**: Redirecting DNS queries to malicious servers
 - **ARP Poisoning**: Manipulating ARP tables to redirect traffic
 - **SSL/TLS Interception**: Intercepting encrypted communications
@@ -99,13 +113,15 @@ In a man-in-the-middle (MitM) attack, the attacker tricks the sending system int
 
 ## Denial of Service Attacks
 
-### Overview
+### DoS Overview
 
-Denial-of-service (DoS) attacks focus on disrupting the use of a system by overwhelming it with unwanted traffic.
+Denial-of-service (DoS) attacks focus on disrupting the use of a system by
+overwhelming it with unwanted traffic.
 
 ### Denial-of-Service (DoS) Attacks
 
-Denial-of-service (DoS) attacks send unwanted traffic from a single attacker system to a victim server, overwhelming it with requests.
+Denial-of-service (DoS) attacks send unwanted traffic from a single attacker
+system to a victim server, overwhelming it with requests.
 
 #### DoS Attack Characteristics
 
@@ -131,7 +147,8 @@ Denial-of-service (DoS) attacks send unwanted traffic from a single attacker sys
 
 ### Distributed Denial-of-Service (DDoS) Attacks
 
-Distributed denial-of-service (DDoS) attacks use a botnet to send the traffic from many different sources.
+Distributed denial-of-service (DDoS) attacks use a botnet to send the traffic from
+many different sources.
 
 #### DDoS Attack Characteristics
 
@@ -165,9 +182,10 @@ Distributed denial-of-service (DDoS) attacks use a botnet to send the traffic fr
 
 ## Side Channel Attacks
 
-### Overview
+### Side Channel Overview
 
-Side channel attacks monitor system activities and retrieve information that is actively being used.
+Side channel attacks monitor system activities and retrieve information that is
+actively being used.
 
 ### Side Channel Attack Methods
 
@@ -179,7 +197,9 @@ Side channel attacks monitor system activities and retrieve information that is 
 
 ### Timing Attacks
 
-A timing attack is an example of a side channel attack. The attacker measures how long a cryptographic operation takes to complete and may use the information to undermine its security.
+A timing attack is an example of a side channel attack. The attacker measures how
+long a cryptographic operation takes to complete and may use the information to
+undermine its security.
 
 #### Timing Attack Process
 
@@ -305,7 +325,8 @@ Effective network threat protection requires:
 - **Malware Protection**: Comprehensive malware detection and prevention
 - **Network Security**: Strong network security controls and monitoring
 - **Incident Response**: Rapid and effective incident response capabilities
-- **Continuous Improvement**: Regular assessment and improvement of security measures
+- **Continuous Improvement**: Regular assessment and improvement of security
+  measures
 
 Key success factors:
 
@@ -315,5 +336,6 @@ Key success factors:
 - **Response Capability**: Ability to respond quickly to security incidents
 - **Regular Updates**: Keeping systems and security measures current
 
-Understanding network threats and attacks is essential for cybersecurity professionals and helps organizations build effective defenses against evolving security risks.
-
+Understanding network threats and attacks is essential for cybersecurity
+professionals and helps organizations build effective defenses against evolving
+security risks.
