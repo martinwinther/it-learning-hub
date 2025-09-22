@@ -18,6 +18,7 @@ Security awareness training is a crucial, ongoing process that helps people unde
 ### Continuous Process
 
 Security training must be an ongoing effort because:
+
 - **Evolving Threats**: New attack methods emerge constantly
 - **Knowledge Decay**: Security awareness diminishes over time without reinforcement
 - **Personnel Changes**: New employees require training, existing staff need updates
@@ -30,6 +31,7 @@ Social engineering uses psychological tricks to manipulate people into performin
 ### Definition and Impact
 
 Social engineering attacks target human psychology rather than technical vulnerabilities. These attacks are particularly dangerous because they:
+
 - Bypass technical security controls
 - Exploit natural human tendencies
 - Can be difficult to detect using traditional security tools
@@ -40,7 +42,7 @@ Social engineering attacks target human psychology rather than technical vulnera
 #### Authority and Trust
 
 - **Definition**: People naturally listen to and comply with authority figures
-- **Examples**: 
+- **Examples**:
   - Impersonating executives or IT personnel
   - Using official-looking documents or uniforms
   - Claiming urgent requests from senior management
