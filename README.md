@@ -15,7 +15,7 @@ This repository serves as my centralized learning hub for:
 
 ## Current Focus Areas
 
-- [ ] ISC2 CC - Cybersecurity fundamentals
+- [ ] CCNA
 
 ## How I Use This Repo
 
