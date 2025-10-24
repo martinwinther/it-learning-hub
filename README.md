@@ -41,8 +41,4 @@ While this is a personal learning repository, I welcome:
 - Corrections if you spot errors
 - Resources or links to quality learning materials
 
----
 
-## Goal
-
-Build a comprehensive IT knowledge foundation
