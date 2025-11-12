@@ -40,5 +40,3 @@ While this is a personal learning repository, I welcome:
 - Suggestions for topics to explore
 - Corrections if you spot errors
 - Resources or links to quality learning materials
-
-
