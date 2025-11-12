@@ -365,7 +365,7 @@ Variable-Length Subnet Masking (VLSM) allows creation of subnets with different 
 ### Small Office/Home Office (SOHO)
 
 - **Home Networks**: Small subnets sufficient for residential use
-- **Small Businesses**: Medium-sized subnets for office envaddironments
+- **Small Businesses**: Medium-sized subnets for office environments
 - **Guest Networks**: Separate smaller subnets for guest access
 
 ## Troubleshooting Subnetting
