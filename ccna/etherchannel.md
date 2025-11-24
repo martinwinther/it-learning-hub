@@ -2,328 +2,248 @@
 
 ## Overview
 
-EtherChannel combines multiple physical links into a single logical link, allowing redundant connections to remain active without causing Layer 2 loops. This maximizes bandwidth utilization, improves network resilience, and simplifies management by treating multiple physical ports as one logical interface.
+EtherChannel combines multiple physical links into one logical interface called a port channel. STP treats the bundle as a single link, so redundant member links can all forward without creating Layer 2 loops. This increases total bandwidth and provides link redundancy while simplifying management.
 
-## The Problem EtherChannel Solves
+## EtherChannel basics
 
-### STP Limitation
+### Problem solved
 
-- STP blocks redundant links to prevent Layer 2 loops
-- Adding multiple links between switches doesn't increase usable bandwidth if STP disables them
-- Only one link remains active, creating a bottleneck
+- STP blocks redundant links to prevent loops
+- Multiple parallel links between switches do not increase usable bandwidth if some are blocked
+- Single active link can become a bottleneck
 
-### EtherChannel Solution
+### EtherChannel behavior
 
-- Combines multiple physical links into a single logical link
-- STP treats the group of links as one unit, allowing all links to remain active
-- Increases total bandwidth while maintaining loop-free topology
-- Logical interfaces are called **port channels** in Cisco IOS
+- Multiple physical interfaces join the same channel group
+- Switch creates a logical `Port-channel` interface (for example, `Po1`)
+- STP sees and manages the port channel as a single port
+- Broadcast, unknown unicast, and multicast frames are not sent back out other ports in the same EtherChannel
+- Total bandwidth is roughly the sum of the member link speeds
 
-## How EtherChannel Works
+## Dynamic vs static EtherChannel
 
-### Logical Interface Creation
+### Dynamic negotiation
 
-- Physical ports are grouped into a channel group
-- A logical port channel interface (e.g., Port-channel1, Po1) is automatically created
-- Frame-switching and STP logic treat all member ports as one entity
-- STP output shows only port channel interfaces, not individual physical ports
+- Uses a protocol to negotiate the bundle
+- Checks that configuration parameters match before forming the EtherChannel
+- Safer in most cases
 
-### Loop Prevention
+Protocols:
 
-- BUM (Broadcast, Unknown unicast, Multicast) frames received on one member port are not flooded out of other ports in the same EtherChannel
-- This prevents Layer 2 loops even though all ports can forward frames
+- PAgP (Cisco proprietary)
+- LACP (IEEE 802.3ad)
 
-### STP Integration
+### Static EtherChannel
 
-- EtherChannel does not eliminate the need for STP
-- In larger LANs, some EtherChannels may still be blocked by STP to prevent loops
-- STP cost calculation considers combined bandwidth of member ports
-
-## EtherChannel Configuration Methods
-
-### Dynamic EtherChannel
-
-- Uses a protocol to negotiate EtherChannel formation between switches
-- Protocols verify configuration parameters match before forming EtherChannel
-- **Recommended approach**: Provides safety checks to prevent misconfiguration
-
-### Static Configuration Method
-
-- Forces EtherChannel formation without negotiation
-- No protocol messages exchanged
-- **Use with caution**: Higher risk of misconfiguration leading to loops
-- Required in some cases (e.g., connecting to wireless LAN controllers)
+- No negotiation protocol
+- Interfaces are forced into an EtherChannel
+- Configuration:
+  - `channel-group <number> mode on`
+- Must be configured on both sides
+- Higher risk of misconfiguration and loops
+- Sometimes required for devices such as wireless LAN controllers
 
 ## Port Aggregation Protocol (PAgP)
 
-### PAgP Overview
+### PAgP overview
 
-- Cisco-proprietary EtherChannel negotiation protocol
-- Supports up to 8 physical links in a single EtherChannel
-- Uses two modes: **desirable** and **auto**
+- Cisco proprietary EtherChannel negotiation protocol
+- Supports up to 8 active links in a bundle
+- Uses PAgP packets to form and maintain the channel
 
-### PAgP Modes
+### PAgP modes
 
-- **desirable**: Actively attempts to form an EtherChannel by sending PAgP messages
-- **auto**: Does not actively attempt to form an EtherChannel but responds to PAgP messages from a desirable-mode neighbor
+- `desirable`
+  - Actively sends PAgP messages
+  - Tries to form an EtherChannel
+- `auto`
+  - Listens for PAgP
+  - Forms an EtherChannel only if the neighbor uses `desirable`
 
-### PAgP Mode Combinations
+Mode combinations:
 
-- **desirable + desirable** = EtherChannel forms
-- **desirable + auto** = EtherChannel forms
-- **auto + auto** = EtherChannel does not form
+- `desirable` + `desirable` → EtherChannel
+- `desirable` + `auto` → EtherChannel
+- `auto` + `auto` → no EtherChannel
 
-### PAgP Configuration
+### PAgP configuration and verification
 
-- Command: `channel-group <group-number> mode {desirable | auto}` in interface configuration mode
-- Group number is locally significant (doesn't need to match on both switches)
-- Example: `channel-group 1 mode desirable`
-
-### PAgP Verification Commands
-
-- `show etherchannel summary`: View EtherChannel status and flags
-- `show pagp neighbor`: View information about PAgP neighbors
+- Interface configuration:
+  - `channel-group <number> mode desirable`
+  - `channel-group <number> mode auto`
+- Verification:
+  - `show etherchannel summary`
+  - `show pagp neighbor`
 
 ## Link Aggregation Control Protocol (LACP)
 
-### LACP Overview
+### LACP overview
 
-- IEEE standard (802.3ad) EtherChannel negotiation protocol
-- Supports up to 16 physical links in a single EtherChannel
-- Only up to 8 links can be active simultaneously; remaining links act as standby (hot-standby)
-- Can run on any vendor's switches (not Cisco-only)
+- IEEE 802.3ad standard
+- Vendor neutral
+- Supports up to 16 member links:
+  - 8 active
+  - 8 standby
+- Common choice in multi vendor environments
 
-### LACP Modes
+### LACP modes
 
-- **active**: Actively attempts to form an EtherChannel by sending LACP messages (equivalent to PAgP desirable)
-- **passive**: Does not actively attempt to form an EtherChannel but responds to LACP messages from an active-mode neighbor (equivalent to PAgP auto)
+- `active`
+  - Actively sends LACP messages
+  - Equivalent to PAgP `desirable`
+- `passive`
+  - Listens for LACP
+  - Equivalent to PAgP `auto`
 
-### LACP Mode Combinations
+Mode combinations:
 
-- **active + active** = EtherChannel forms
-- **active + passive** = EtherChannel forms
-- **passive + passive** = EtherChannel does not form
+- `active` + `active` → EtherChannel
+- `active` + `passive` → EtherChannel
+- `passive` + `passive` → no EtherChannel
 
-### LACP Configuration
+### LACP configuration and verification
 
-- Command: `channel-group <group-number> mode {active | passive}` in interface configuration mode
-- Example: `channel-group 1 mode active`
+- Interface configuration:
+  - `channel-group <number> mode active`
+  - `channel-group <number> mode passive`
+- Verification:
+  - `show etherchannel summary`
+  - `show lacp neighbor`
 
-### LACP Verification Commands
+## Mode compatibility summary
 
-- `show etherchannel summary`: View EtherChannel status and flags
-- `show lacp neighbor`: View information about LACP neighbors
+Valid combinations between sides:
 
-## Static EtherChannel
+| Side A mode | Side B mode | Result       |
+|------------|-------------|--------------|
+| desirable  | desirable   | Forms        |
+| desirable  | auto        | Forms        |
+| auto       | auto        | No channel   |
+| active     | active      | Forms        |
+| active     | passive     | Forms        |
+| passive    | passive     | No channel   |
+| on         | on          | Forms (static) |
 
-### Static EtherChannel Overview
+Notes:
 
-- No negotiation protocol used
-- Both sides must be configured in **on** mode
-- Forms EtherChannel regardless of neighboring device state
-- Higher risk of misconfiguration
+- PAgP and LACP do not talk to each other
+- Dynamic modes do not interoperate with `on`
+- Both sides must use the same protocol type and compatible modes
 
-### Static EtherChannel Configuration
+## Port configuration requirements
 
-- Command: `channel-group <group-number> mode on` in interface configuration mode
-- Both switches must use **on** mode for EtherChannel to form
+### Matching settings
 
-### When to Use
+All member ports in the same EtherChannel must match on key settings:
 
-- Required for some devices (e.g., wireless LAN controllers)
-- Not recommended for general use; prefer dynamic protocols
+- Speed
+- Duplex
+- Access or trunk mode
+- Access VLAN (for access ports)
+- Allowed VLAN list (for trunks)
+- Native VLAN (for trunks)
 
-## EtherChannel Mode Compatibility
+If a member has different settings, it may be placed in a suspended state and removed from the bundle.
 
-### Valid Combinations
+### Configuration approach
 
-| Mode 1 | Mode 2 | Result |
-|--------|--------|--------|
-| Desirable | Desirable | Yes |
-| Desirable | Auto | Yes |
-| Auto | Auto | No |
-| Active | Active | Yes |
-| Active | Passive | Yes |
-| Passive | Passive | No |
-| On | On | Yes |
+- Add ports to the same channel group
+- Configure common settings on the port channel interface:
 
-### Invalid Combinations
+  ```text
+  interface range Gi0/1 - 2
+   channel-group 1 mode active
+  !
+  interface Port-channel1
+   switchport mode trunk
+   switchport trunk allowed vlan 10,20,30
+  ```
 
-- PAgP modes (desirable/auto) cannot form EtherChannel with LACP modes (active/passive)
-- Dynamic modes (PAgP/LACP) cannot form EtherChannel with static mode (on)
-- Protocols are like languages: devices must use the same protocol to communicate
+Notes:
 
-## Port Configuration Requirements
+- Configuration on the port channel is inherited by member ports
+- Best practice is to configure most settings on the port channel, not individually on each member, after the channel is up
 
-### Settings That Must Match
+## Load balancing
 
-All ports in the same EtherChannel must have identical settings:
+### Principle
 
-- **Speed**: All ports must operate at the same speed
-- **Duplex**: All ports must use the same duplex setting
-- **Operational mode**: All ports must be access or trunk (cannot mix)
-- **Allowed VLANs**: When in trunk mode, allowed VLANs must match
-- **Native VLAN**: When in trunk mode, native VLAN must match
-- **Access VLAN**: When in access mode, access VLAN must match
-
-### Configuration Inheritance
-
-- Commands configured on the port channel interface are inherited by member ports
-- Commands configured on member ports are inherited by the port channel interface
-- **Best practice**: Configure settings on the port channel interface after EtherChannel is formed
-- Configuring member ports directly can cause the EtherChannel to flap (briefly go down)
-
-### Suspended Ports
-
-- If a port's settings don't match other ports in the EtherChannel, it enters a **suspended** state
-- Suspended ports cannot participate in the EtherChannel or forward frames
-- Port automatically recovers when settings match other member ports
-
-## EtherChannel Load Balancing
-
-### Load Balancing by Flow
-
-- Frames are load-balanced over physical links by **flow**
-- A **flow** is a communication between two nodes
-- All frames in the same flow use the same physical link
+- Switch load balances traffic across member links per flow
+- A flow is usually defined by MAC or IP address fields
+- All frames for the same flow use the same physical link
 - Different flows can use different links
 
-### Load Balancing Parameters
+### Load balance options
 
-- Configure with `port-channel load-balance <parameters>` in global configuration mode
-- Common parameters:
-  - `src-mac`: Source MAC address
-  - `dst-mac`: Destination MAC address
-  - `src-dst-mac`: Combination of source and destination MAC addresses
-  - `src-ip`: Source IP address (for encapsulated IP packets)
-  - `dst-ip`: Destination IP address (for encapsulated IP packets)
-  - `src-dst-ip`: Combination of source and destination IP addresses (default on many switches)
+- Global command:
+  - `port-channel load-balance <option>`
+- Common options:
+  - `src-mac`
+  - `dst-mac`
+  - `src-dst-mac`
+  - `src-ip`
+  - `dst-ip`
+  - `src-dst-ip`
 
-### Non-IP Traffic
+- Verification:
+  - `show etherchannel load-balance`
 
-- For frames that don't encapsulate IP packets, switches use MAC address-based load balancing
-- Typically uses source XOR destination MAC address
+Traffic distribution depends on the chosen fields. A poor choice can cause uneven usage of links.
 
-### Verification
-
-- `show etherchannel load-balance`: View current load-balancing parameters
-
-### Load Balancing Considerations
-
-- Load balancing may not always distribute traffic evenly across all links
-- Changing parameters can help improve distribution
-- Example: Using only destination MAC address may cause all traffic to default gateway to use same link
-
-## Bandwidth vs Speed
-
-### Bandwidth
-
-- Total number of bits that can be transferred per second
-- EtherChannel bandwidth = sum of all member link bandwidths
-- Example: Four 1 Gbps links = 4 Gbps total bandwidth
-
-### Speed
-
-- Maximum speed of any individual communication
-- Adding links doesn't increase individual link speed
-- Example: Four 1 Gbps links still means each flow maxes at 1 Gbps
-
-### Analogy
-
-- Like adding lanes to a highway: increases total capacity but doesn't change speed limit
-- Can reduce congestion, allowing traffic to flow at maximum speed more consistently
-
-## Layer 2 vs Layer 3 EtherChannels
+## Layer 2 and Layer 3 EtherChannel
 
 ### Layer 2 EtherChannel
 
-- Consists of switch ports that switch frames
-- Most common use case
-- Provides redundancy and increased bandwidth for inter-switch links
-- STP treats as single logical port
-- Configured with `switchport mode {access | trunk}` on port channel interface
+- Member ports are switchports
+- Used between switches or from switch to server
+- STP sees a single logical port
+- Configure `switchport` settings on the port channel
 
 ### Layer 3 EtherChannel
 
-- Consists of routed ports that route packets
-- Used on multilayer switches or routers
-- Provides load balancing and simplified management for Layer 3 connections
-- No STP involvement (routed ports don't cause Layer 2 loops)
-- Configuration steps:
-  1. Use `no switchport` on member ports before adding to EtherChannel
-  2. Add ports to channel group: `channel-group <group-number> mode {active | passive | on}`
-  3. Configure IP address on port channel interface (not member ports)
+- Member ports are routed ports
+- No STP participation
+- Used between routers or multilayer switches
 
-### Layer 3 EtherChannel Benefits
+Configuration outline:
 
-- Load-balance packets over multiple links
-- Easier management: configure IP addressing and routing for one logical interface
-- Simplified routing table entries
+- On member interfaces:
+  - `no switchport`
+  - `channel-group <number> mode {active | passive | on}`
+- On port channel:
+  - `interface Port-channel<number>`
+  - `ip address <ip> <mask>`
 
-## Verification Commands
+## Verification and troubleshooting
 
-### General EtherChannel Status
+### Key commands
 
-- `show etherchannel summary`: View all EtherChannels, protocols, member ports, and status flags
-- `show interfaces port-channel <number>`: View detailed information about a specific port channel interface
-- `show spanning-tree`: View STP status (shows port channel interfaces, not member ports)
+- `show etherchannel summary`
+  - Lists port channels, protocol, member ports, and status flags
+- `show interfaces port-channel <number>`
+  - Detailed view of a specific port channel
+- `show spanning-tree`
+  - Shows port channels participating in STP
+- `show pagp neighbor`
+- `show lacp neighbor`
 
-### Protocol-Specific Commands
+### Common issues
 
-- `show pagp neighbor`: View PAgP neighbor information
-- `show lacp neighbor`: View LACP neighbor information
+- Channel not forming
+  - Check mode compatibility and that both sides use the same protocol
+- Ports suspended
+  - Verify speed, duplex, VLAN, and trunk settings match
+- Uneven load distribution
+  - Review load-balance setting
+  - Consider using both source and destination fields
 
-### Load Balancing
+## Quick review
 
-- `show etherchannel load-balance`: View current load-balancing parameters
-
-### Status Flags
-
-Common flags in `show etherchannel summary` output:
-
-- **D**: Down
-- **P**: Bundled in port-channel
-- **I**: Stand-alone (independent)
-- **s**: Suspended
-- **H**: Hot-standby (LACP only)
-- **R**: Layer 3 EtherChannel
-- **S**: Layer 2 EtherChannel
-- **U**: In use (operational)
-
-## Troubleshooting EtherChannel
-
-### Common Issues
-
-- **EtherChannel not forming**: Check that both sides use compatible modes (same protocol, valid combination)
-- **Ports suspended**: Verify all member ports have matching settings (speed, duplex, mode, VLANs)
-- **Uneven load distribution**: Review load-balancing parameters; consider changing to better distribute traffic
-- **EtherChannel flaps**: Avoid configuring member ports directly; use port channel interface instead
-
-### Best Practices
-
-- Use dynamic EtherChannel (PAgP or LACP) instead of static when possible
-- Configure settings on port channel interface after EtherChannel is formed
-- Ensure all member ports have identical settings before adding to EtherChannel
-- Use LACP for multi-vendor environments
-- Verify EtherChannel status with `show etherchannel summary` after configuration
-
-## Real-World Applications
-
-- **Data center inter-switch links**: Maximize bandwidth between core switches
-- **Access layer redundancy**: Provide redundant paths from access switches to distribution layer
-- **Server connectivity**: Aggregate multiple links to high-traffic servers
-- **Multi-vendor environments**: Use LACP for interoperability between different switch vendors
-- **Layer 3 redundancy**: Use Layer 3 EtherChannels for redundant routed connections
-
-## Summary
-
-- EtherChannel combines multiple physical links into a single logical link, allowing all links to remain active
-- Dynamic EtherChannels use PAgP (Cisco-proprietary) or LACP (IEEE standard) to negotiate formation
-- PAgP supports up to 8 links; LACP supports up to 16 links (8 active, 8 standby)
-- Static EtherChannels use **on** mode but are not recommended due to safety concerns
-- All member ports must have matching settings (speed, duplex, mode, VLANs)
-- Frames are load-balanced by flow over physical links
-- Layer 2 EtherChannels are for switch ports; Layer 3 EtherChannels are for routed ports
-- Configure settings on port channel interface to ensure consistency and prevent flapping
-- EtherChannel increases total bandwidth but not individual link speed
-- Always verify EtherChannel status and use dynamic protocols when possible
+- EtherChannel bundles multiple physical links into one logical port channel to increase bandwidth and provide redundancy.
+- STP treats the bundle as a single port, allowing all member links to forward without creating loops.
+- Dynamic EtherChannel uses PAgP or LACP; static EtherChannel uses `mode on` with no negotiation.
+- PAgP: Cisco proprietary with `desirable` and `auto` modes.
+- LACP: IEEE 802.3ad with `active` and `passive` modes and support for standby links.
+- All member ports must match on speed, duplex, and VLAN-related settings.
+- Load balancing uses MAC or IP fields to keep each flow on a single link.
+- EtherChannel can operate at Layer 2 or Layer 3 depending on whether ports are switchports or routed ports.

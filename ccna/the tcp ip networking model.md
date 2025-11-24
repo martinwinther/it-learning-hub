@@ -2,265 +2,186 @@
 
 ## Overview
 
-Networking models provide frameworks to define the functions necessary to enable network communications. These models help us understand how data travels from source to destination across networks and ensure that devices from different vendors can communicate effectively.
+Networking models describe the functions needed for communication between hosts. The main models are the OSI reference model and the TCP/IP model. OSI is used mostly for terminology and teaching, while TCP/IP matches how modern networks actually operate.
 
-The two primary networking models are the Open Systems Interconnection (OSI) model and the Internet Protocol Suite (TCP/IP) model. While the OSI model influenced how we think about networks, the TCP/IP model is what's actually used in modern networks today.
+## Conceptual models of networking
 
-## Conceptual Models of Networking
+### From vendor specific to open models
 
-### Evolution from Vendor-Specific to Vendor-Neutral
+Early networks used proprietary stacks from individual vendors. Standard, vendor neutral models changed this by:
 
-Historically, networking was dominated by vendor-specific models (such as IBM's systems). The development of vendor-neutral models revolutionized networking because:
+- Allowing devices from different vendors to interoperate
+- Providing standard protocols at each layer
+- Giving a common language for design and troubleshooting
 
-- All devices can now communicate with each other regardless of manufacturer
-- Standard protocols ensure interoperability
-- Network design and troubleshooting became more systematic
+### Layered structure
 
-### Networking Model Structure
+Networking models are divided into layers, each responsible for specific functions. Benefits of a layered model:
 
-Networking models are divided into layers; each layer describes a necessary function for network communications and includes multiple protocols that can fulfill the layer's role. This layered approach provides several benefits:
+- Modularity between functions
+- Clear separation of responsibilities
+- Easier troubleshooting by isolating problems to layers
+- Flexibility to change protocols at one layer without affecting others
 
-- **Modularity**: Each layer has specific responsibilities
-- **Standardization**: Common protocols at each layer
-- **Troubleshooting**: Issues can be isolated to specific layers
-- **Flexibility**: Protocols at one layer can be changed without affecting others
+## OSI reference model (seven layers)
 
-## The OSI Reference Model
+The OSI model is a seven layer conceptual model defined by ISO. It is not used directly in production networks but remains important for language and exam questions.
 
-The Open Systems Interconnection Reference (OSI) model is a networking model that influenced how we think and talk about networks but is not in use today. It was developed by the International Organization for Standardization (ISO).
+| Layer | Name         | Main function                             |
+|-------|--------------|--------------------------------------------|
+| 7     | Application  | Network services to applications          |
+| 6     | Presentation | Data format, translation, encryption      |
+| 5     | Session      | Session setup and management              |
+| 4     | Transport    | End to end transport, reliability         |
+| 3     | Network      | Logical addressing and routing            |
+| 2     | Data Link    | Framing, local delivery, error detection  |
+| 1     | Physical     | Signaling, cabling, connectors            |
 
-### OSI Seven-Layer Structure
+OSI layer numbers and names are still widely used when describing problems and protocols.
 
-The OSI model has seven layers: (1) Physical, (2) Data Link, (3) Network, (4) Transport, (5) Session, (6) Presentation, and (7) Application.
+## TCP/IP model
 
-| Layer | Name         | Function |
-|-------|--------------|----------|
-| 7     | Application  | Network services to applications |
-| 6     | Presentation | Data translation, encryption, compression |
-| 5     | Session      | Establishing, managing sessions |
-| 4     | Transport    | Reliable data transport |
-| 3     | Network      | Path determination and logical addressing |
-| 2     | Data Link    | Frame formatting, error detection |
-| 1     | Physical     | Physical transmission of data |
+The Internet Protocol Suite (TCP/IP) is the model used in real networks. It groups functions into fewer layers than OSI.
 
-### Legacy and Relevance
+### Four layer and five layer views
 
-While the OSI model is considered a relic of the past, it's worth knowing because:
+Two common views of the TCP/IP model:
 
-- The terminology is still widely used in networking
-- Layer numbering convention is retained in modern models
-- Provides educational framework for understanding network functions
-- Industry certifications often reference OSI layers
+- Four layer: Link, Internet, Transport, Application
+- Five layer (used in many CCNA discussions):
+  - Layer 1: Physical
+  - Layer 2: Data Link
+  - Layer 3: Network
+  - Layer 4: Transport
+  - Layer 7: Application
 
-## The TCP/IP Model
+The five layer view aligns layer numbers with OSI, which keeps the familiar Layer 1 to Layer 7 terminology.
 
-The Internet Protocol Suite (TCP/IP) model is the networking model used in modern networks and is named after two of its key protocols: Transmission Control Protocol (TCP) and Internet Protocol (IP).
+### OSI to TCP/IP mapping
 
-### Historical Background
+| OSI layers             | TCP/IP (5 layer) | Example protocols          |
+|------------------------|------------------|----------------------------|
+| 7 Application          | Application      | HTTP, HTTPS, FTP, SSH      |
+| 6 Presentation         | Application      |                            |
+| 5 Session              | Application      |                            |
+| 4 Transport            | Transport        | TCP, UDP                   |
+| 3 Network              | Network          | IPv4, IPv6                 |
+| 2 Data Link            | Data Link        | Ethernet, 802.11 (Wi-Fi)   |
+| 1 Physical             | Physical         | Copper, fiber, radio       |
 
-The TCP/IP model was born out of research by the US Department of Defense Advanced Research Projects Agency (DOD DARPA). It was originally called the ARPANET reference model, which later evolved into the modern internet.
+## TCP/IP layer functions
 
-### TCP/IP Layer Structure
+The goal of the TCP/IP model is to allow an application on one host to communicate with an application on another host. Each layer has its own role in that path.
 
-The original TCP/IP model has four layers, but a more popular version has five: (1) Physical, (2) Data Link, (3) Network, (4) Transport, and (5) Application (called Layer 7, not Layer 5).
+### Layer 1: Physical
 
-| OSI Model    | Four-Layer TCP/IP | Five-Layer TCP/IP | Example Protocols         |
-|--------------|-------------------|-------------------|---------------------------|
-| Application  | Application       | Application       | HTTP, HTTPS, FTP, SSH    |
-| Presentation | Application       | Application       |                           |
-| Session      | Application       | Application       |                           |
-| Transport    | Transport         | Transport         | TCP, UDP                  |
-| Network      | Internet          | Network           | IPv4, IPv6               |
-| Data Link    | Link              | Data Link         | Ethernet, 802.11 (Wi-Fi) |
-| Physical     | Link              | Physical          |                           |
+- Defines physical media, connectors, and signaling
+- Handles bit level transmission on cables, fiber, or radio
+- Examples: UTP cabling, optical fiber, Wi-Fi radio parameters
 
-### Layer Numbering Convention
+### Layer 2: Data Link
 
-Layers are named from bottom to top. The Physical layer is Layer 1 and the Application layer is Layer 7 because of the old terminology from the OSI model. This maintains consistency with established networking terminology.
+- Provides local (hop to hop) delivery across a single link
+- Uses MAC addresses for local addressing
+- Defines frames, error detection, and media access rules
+- Examples: Ethernet, 802.11 (Wi-Fi)
 
-## TCP/IP Model Layer Functions
+### Layer 3: Network
 
-The end goal of the TCP/IP model is for an application on one computer to be able to communicate with an application on another computer. Each layer has specific responsibilities in achieving this goal.
+- Provides end to end delivery between hosts on different networks
+- Uses logical addresses (IP addresses)
+- Performs routing and path selection
+- Supports subnetting and hierarchical addressing
 
-### Layer 1: Physical Layer
+Important addressing behavior:
 
-Layer 1 (Physical) defines physical requirements for transmitting data, such as ports, connectors, and cables, and how data should be encoded into electrical, light, or radio signals.
+- Destination MAC address can change at each hop
+- Destination IP address remains the same from source to destination
 
-**Key Functions:**
+### Layer 4: Transport
 
-- Physical requirements for transmitting data from one node to another
-- Specifications for cables, connectors, and ports
-- Signal encoding (electrical, optical, radio)
-- Bit transmission over physical medium
+- Delivers data to the correct application process on the destination host
+- Uses port numbers to identify application sessions
+- May provide reliability and flow control (TCP) or simple, low overhead delivery (UDP)
 
-### Layer 2: Data Link Layer
+Typical protocols:
 
-Layer 2 (Data Link) is responsible for hop-to-hop delivery of messages. A hop is the journey from one node in the network to the next in the path to the final destination.
+- TCP – reliable, connection oriented, ordered delivery
+- UDP – connectionless, no built in reliability, low overhead
 
-**Key Functions:**
-
-- Prepares data for transmission over the physical medium
-- Provides hop-to-hop delivery
-- Uses media access control (MAC) addresses to address messages to the next hop
-- Error detection and frame formatting
-- Controls access to the physical medium
-
-### Layer 3: Network Layer
-
-Layer 3 (Network) is responsible for end-to-end delivery of messages, from the source host to the destination host.
-
-**Key Functions:**
-
-- End-to-end delivery across multiple networks
-- Uses Internet Protocol (IP) addresses to address messages to the destination host
-- Path determination and routing decisions
-- Logical addressing and subnetting
-
-**Important Addressing Behavior:**
-
-- The destination MAC address of a message changes at each hop
-- The destination IP address remains the same throughout the entire journey
-
-### Layer 4: Transport Layer
-
-Layer 4 (Transport) is used to address messages to the appropriate application on the destination host.
-
-**Key Functions:**
-
-- Ensures data reaches the correct application process on the destination host
-- Uses port numbers (not related to physical ports) for addressing
-- The port number identifies the Layer 7 protocol being used
-- Provides reliability and flow control (TCP) or speed (UDP)
-
-**Common Protocols:**
-
-- **TCP**: Implements checks to ensure each message reaches its destination
-- **UDP**: Sends data without reliability checks (faster but may lose data)
-
-### Layer 7: Application Layer
-
-Layer 7 (Application) is the interface between applications and the network. Layer 7 protocols such as Hypertext Transfer Protocol Secure (HTTPS) are not applications themselves but provide services for applications to enable them to communicate over the network.
-
-**Key Functions:**
+### Layer 7: Application
 
 - Interface between applications and the network
-- Provides network services to applications
-- Examples include web browsing (HTTPS), file transfer (FTP), remote access (SSH)
+- Provides network services used by software
+- Examples: HTTP, HTTPS, FTP, DNS, SSH
 
-## Data Encapsulation and De-Encapsulation
+These protocols are not the applications themselves but services that applications use.
 
-### Encapsulation Process
+## Encapsulation and de-encapsulation
 
-A host encapsulates application data with a Layer 4 header, Layer 3 header, and Layer 2 header/trailer before being transmitted over the physical medium (cable or radio waves).
+Data is encapsulated as it moves down the stack for transmission and de-encapsulated as it moves up the stack on reception.
 
-**Five-Step Encapsulation Process:**
+### Encapsulation steps (sending host)
 
-1. **Layer 7**: Application creates data
-2. **Layer 4**: Adds header addressed to a specific port number
-3. **Layer 3**: Adds header addressed to the destination IP address
-4. **Layer 2**: Adds header and trailer addressed to the next-hop device
-5. **Layer 1**: Transmits bits over the physical medium
+1. Application layer produces application data.
+2. Transport layer adds a Layer 4 header (TCP or UDP) with source and destination ports. This forms a segment.
+3. Network layer adds a Layer 3 header with source and destination IP addresses. This forms a packet.
+4. Data Link layer adds a Layer 2 header and trailer with source and destination MAC addresses. This forms a frame.
+5. Physical layer sends the bits that make up the frame across the medium.
 
-The process of adding headers and trailers is called encapsulation.
+The process of adding headers and trailers at each layer is encapsulation.
 
-### De-Encapsulation Process
+### De-encapsulation steps (receiving host)
 
-After a message is received by a host, the host de-encapsulates it by inspecting and removing the Layer 2 header and trailer, inspecting and removing the Layer 3 header, inspecting and removing the Layer 4 header, and finally processing the data in the message.
+1. Physical layer receives signals and rebuilds the bit stream.
+2. Data Link layer reads and removes the Layer 2 header and trailer.
+3. Network layer reads and removes the Layer 3 header.
+4. Transport layer reads and removes the Layer 4 header.
+5. Application layer processes the remaining data.
 
-**De-Encapsulation Steps:**
-
-1. **Layer 1**: Receives bits from physical medium
-2. **Layer 2**: Inspects and removes header and trailer
-3. **Layer 3**: Inspects and removes header
-4. **Layer 4**: Inspects and removes header
-5. **Layer 7**: Processes the application data
+Each layer examines its own header, makes decisions, and passes the payload up to the next layer.
 
 ## Protocol Data Units (PDUs)
 
-At each stage in the encapsulation/de-encapsulation process, there is a specific name given to the message:
+Each layer has a preferred name for its data unit.
 
-### PDU Terminology
+- Segment – Layer 4 PDU (transport layer)
+- Packet – Layer 3 PDU (network layer)
+- Frame – Layer 2 PDU (data link layer)
 
-- **Segment**: The combination of data and a Layer 4 header is called a segment (L4PDU)
-- **Packet**: The combination of a segment and a Layer 3 header is called a packet (L3PDU)
-- **Frame**: The combination of a packet and a Layer 2 header/trailer is called a frame (L2PDU)
+Payload relationships:
 
-### Payload Concept
+- A frame contains a packet as its payload.
+- A packet contains a segment as its payload.
+- A segment contains application data as its payload.
 
-The contents encapsulated inside each protocol data unit (PDU) are its payload:
+## Layer interactions
 
-- A frame's payload is a packet
-- A packet's payload is a segment  
-- A segment's payload is the application data
+### Adjacent layer interaction
 
-## Layer Interactions
+Inside a host, each layer provides services to the layer above it:
 
-### Adjacent-Layer Interaction
+- Layer 1 provides a medium for Layer 2 frames.
+- Layer 2 delivers frames so that Layer 3 can move packets between hosts.
+- Layer 3 delivers packets so that Layer 4 can manage end to end sessions.
+- Layer 4 delivers data so that the Application layer can support user software.
 
-Within a computer, each layer provides a service for the layer above it; this is called adjacent-layer interaction.
+### Same layer interaction
 
-**Service Relationships:**
+Same layers on different devices communicate using common protocols:
 
-- **Layer 4 to Layer 7**: Delivers data to the appropriate application on the destination host
-- **Layer 3 to Layer 4**: Delivers segments to the correct destination host
-- **Layer 2 to Layer 3**: Delivers packets to the next hop
-- **Layer 1 to Layer 2**: Provides physical medium for frames to travel over
+- Application to application using protocols such as HTTP or SSH
+- Transport to transport using TCP or UDP headers and acknowledgments
+- Network to network using IP headers and routing decisions
+- Data Link to Data Link using frame formats and MAC addressing
 
-### Same-Layer Interaction
+The headers added by each layer carry information used by the matching layer on the other device.
 
-Communication between the same layer on different computers is called same-layer interaction.
+## Quick review
 
-**Same-Layer Communication Process:**
-
-- **Application Data**: Sent from one application to another application
-- **Layer 4**: Segment addressed to Layer 4 of destination host for header inspection
-- **Layer 3**: Packet addressed to Layer 3 of destination host for header inspection  
-- **Layer 2**: Frame addressed to Layer 2 of next hop for header/trailer inspection
-- **Layer 1**: Signals sent from physical port of one device to physical port of another
-
-## Real-World Applications
-
-### Network Troubleshooting
-
-Understanding the TCP/IP model layers helps in systematic troubleshooting:
-
-- **Physical issues**: Cable problems, interface status
-- **Data Link issues**: Switch configuration, VLAN problems
-- **Network issues**: Routing problems, IP addressing
-- **Transport issues**: Port blocking, firewall rules
-- **Application issues**: Service configuration, protocol mismatches
-
-### Protocol Selection
-
-Different layers offer protocol choices based on requirements:
-
-- **Transport Layer**: TCP for reliability vs UDP for speed
-- **Network Layer**: IPv4 vs IPv6 addressing
-- **Data Link Layer**: Ethernet vs Wi-Fi vs other technologies
-- **Application Layer**: HTTP vs HTTPS vs FTP vs SSH
-
-### Network Design
-
-The layered model guides network architecture decisions:
-
-- **Separation of Concerns**: Each layer handles specific functions
-- **Scalability**: Layers can be upgraded independently
-- **Interoperability**: Standard interfaces between layers
-- **Modularity**: Components can be replaced without affecting other layers
-
-## Summary
-
-Understanding the TCP/IP networking model is fundamental to network administration and troubleshooting:
-
-- **Model Purpose**: Frameworks define functions necessary for network communications
-- **Layer Structure**: Each layer describes necessary functions with multiple protocol options
-- **OSI Legacy**: Seven-layer model influences terminology but isn't used in practice
-- **TCP/IP Reality**: Five-layer model used in modern networks (Physical, Data Link, Network, Transport, Application)
-- **Layer Functions**: Each layer has specific addressing and delivery responsibilities
-- **Addressing Hierarchy**: MAC addresses change per hop, IP addresses remain constant, port numbers identify applications
-- **Encapsulation**: Data gains headers/trailers as it moves down layers for transmission
-- **De-Encapsulation**: Headers/trailers removed as data moves up layers upon reception
-- **PDU Names**: Segments (L4), packets (L3), frames (L2) with payloads containing higher-layer data
-- **Interactions**: Adjacent layers provide services; same layers communicate across devices
-
-The TCP/IP model provides the foundation for understanding how modern networks operate, enabling effective network design, implementation, and troubleshooting in enterprise environments.
+- OSI is a seven layer conceptual model used for terminology; TCP/IP is the model used in real networks.  
+- The five layer TCP/IP view maps to Physical, Data Link, Network, Transport, and Application layers.  
+- Data is encapsulated as it moves down the stack and de-encapsulated as it moves up.  
+- Layer 2 uses MAC addresses for local delivery; Layer 3 uses IP addresses for end to end delivery; Layer 4 uses port numbers for application delivery.  
+- PDUs are called frames at Layer 2, packets at Layer 3, and segments at Layer 4, with each PDU carrying the higher layer PDU as its payload.  
+- Adjacent layers interact inside a host, while same layers communicate between hosts using shared protocols.  

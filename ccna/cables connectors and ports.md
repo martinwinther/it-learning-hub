@@ -2,236 +2,246 @@
 
 ## Overview
 
-In modern networks, Ethernet is the standard for connecting networks. Ethernet is not one single thing, but a collection of standards for physical wired connections. Standards provide agreed-upon sets of rules for communication over networks, ensuring devices can communicate effectively regardless of manufacturer.
+Ethernet is the standard for most wired LANs. It covers physical media, connectors, signaling, and how bits move between devices. For CCNA, focus on cable types, speeds, distances, and where each is used.
 
-## Network Standards
+## Network standards
 
-### Communication Requirements
+### Communication requirements
 
-For two computers to communicate they must adhere to the same rules of communication, including:
+For two devices to communicate, they must agree on:
 
-- How to format data
-- Specifications for physical cables and ports
-- Radio wave protocols for wireless communication
+- How to format data on the wire
+- Cable and connector specifications
+- Signaling method on the medium (electrical or optical)
+- Rules for sending and receiving
 
-### IEEE Standards Organization
+### IEEE standards
 
-The main governing body for these standards is the Institute of Electrical and Electronics Engineers (IEEE):
+The IEEE 802 working groups define LAN and wireless standards.
 
-- **IEEE 802.3**: Ethernet standards for wired connections
-- **IEEE 802.11**: Wi-Fi standards for wireless connections
+Key families:
 
-Ethernet is a family of standards defined by the Institute of Electrical and Electronics Engineers (IEEE) 802.3 working group. It defines standards for communication over physical wired connections, covering both physical aspects and how data should be formatted.
+- **IEEE 802.3**: Ethernet over copper and fiber
+- **IEEE 802.11**: Wi-Fi
 
-## Binary Communication
+Ethernet is a family of related standards under IEEE 802.3. It specifies both the physical layer details and how bits are encoded on the link.
 
-### Fundamental Concepts
+## Binary communication
 
-Computers compute and communicate using binary: 0s and 1s. Understanding binary is essential for network communication:
+### Bits and bytes
 
-- **Bit (Binary Digit)**: Expresses all values using only two digits: 0 and 1
-- **Byte**: A group of 8 bits
-- **Binary Communication**: Everything a computer does involves 0s and 1s
+- **Bit**: smallest unit, 0 or 1
+- **Byte**: 8 bits
+- All data sent on a link is a stream of bits.
 
-### Signal Transmission
+### Signaling on copper
 
-These 1s and 0s can be communicated over copper cables by adjusting the voltage, allowing digital information to travel across physical media.
+On copper, bits are represented by changes in voltage on the wire pairs. Network adapters convert frames into electrical signals and back again.
 
-### Network Speed Measurement
+### Speed units
 
-Network speeds are measured in bits per second using units like:
+Network speed is measured in bits per second.
 
-- **Kilobit**: 1,000 bits
-- **Megabit**: 1,000 kilobits (1 million bits)
-- **Gigabit**: 1,000 megabits (1 billion bits)
-- **Terabit**: 1,000 gigabits (1 trillion bits)
+- **Kbps**: kilobit per second, 1,000 bits per second
+- **Mbps**: megabit per second, 1,000 Kbps
+- **Gbps**: gigabit per second, 1,000 Mbps
+- **Tbps**: terabit per second, 1,000 Gbps
 
-## Copper UTP Connections
+## Copper UTP connections
 
-The most common connection type in Ethernet LANs uses copper unshielded twisted pair (UTP) cables. These are most often called "ethernet cables," although the Ethernet standard can use both copper and fiber.
+Most Ethernet LAN links use copper unshielded twisted pair (UTP) with 8P8C connectors, often called RJ45.
 
-### UTP Cable Construction
+### UTP cable construction
 
-#### Connector Types
+#### Connectors
 
-The connector at the end is called an **8P8C connector** (8 position 8 contact), which allows the cable to connect to ports. Also known as **RJ45** (Registered Jack-45).
+- **8P8C (RJ45)**: 8 positions, 8 contacts
+- Plugs on cable ends, jacks on devices and patch panels
 
-#### Cable Structure
+#### Cable types
 
-- **UTP (Unshielded Twisted Pair)**: The most common cable type
-- **STP (Shielded Twisted Pair)**: Less common alternative with metallic shielding
-- **Wire Configuration**: Each cable contains 8 individual wires inside
+- **UTP (Unshielded Twisted Pair)**
+  - No metal shielding
+  - Pairs of wires are twisted to reduce electromagnetic interference (EMI)
+- **STP (Shielded Twisted Pair)**
+  - Has additional shielding to reduce EMI
+  - Used in more noisy environments
 
-#### Twisted Pair Benefits
+Each cable has 8 individual conductors arranged as 4 twisted pairs.
 
-Unshielded means the wires in the cable do not have a metallic shield around them to protect against electromagnetic interference (EMI). Twisted pair means the eight wires in the cable are twisted together to form four pairs of two wires. The twisting of the wires reduces EMI between the wires of each pair.
+### IEEE 802.3 copper standards
 
-### IEEE 802.3 Standards (Copper)
+| Speed    | Ethernet name       | IEEE task group | Informal name | Maximum cable length |
+|----------|---------------------|-----------------|---------------|----------------------|
+| 10 Mbps  | Ethernet            | 802.3           | 10BASE-T      | 100 m                |
+| 100 Mbps | Fast Ethernet       | 802.3u          | 100BASE-T     | 100 m                |
+| 1 Gbps   | Gigabit Ethernet    | 802.3ab         | 1000BASE-T    | 100 m                |
+| 10 Gbps  | 10 Gigabit Ethernet | 802.3an         | 10GBASE-T     | 100 m                |
 
-The IEEE defines various standards for Ethernet, each with different capabilities:
+All UTP-based Ethernet standards listed here support 100 meters maximum per segment. Longer runs need fiber or repeaters.
 
-| Speed   | Speed-ethernet name | IEEE task group | Informal name | Maximum cable length |
-|---------|---------------------|-----------------|---------------|-----------------------|
-| 10 Mbps | Ethernet            | IEEE 802.3      | 10BASE-T      | 100 m                |
-| 100 Mbps| Fast Ethernet       | IEEE 802.3u     | 100BASE-T     | 100 m                |
-| 1 Gbps  | Gigabit Ethernet    | IEEE 802.3ab    | 1000BASE-T    | 100 m                |
-| 10 Gbps | 10 Gig Ethernet     | IEEE 802.3an    | 10GBASE-T     | 100 m                |
+### Cable categories
 
-All UTP-based Ethernet standards support a maximum cable length of 100 meters. Above that distance, you can experience decreased performance.
+Higher speeds require newer cable categories.
 
-### Cable Categories
+| Speed    | Ethernet informal name | Typical cable category |
+|----------|------------------------|------------------------|
+| 10 Mbps  | 10BASE-T               | Cat 3                  |
+| 100 Mbps | 100BASE-T              | Cat 5                  |
+| 1 Gbps   | 1000BASE-T             | Cat 5e or Cat 6        |
+| 10 Gbps  | 10GBASE-T              | Cat 6a or better       |
 
-Different speeds require different cable categories:
+Real networks often deploy Cat 5e, Cat 6, or Cat 6a for new installations.
 
-| Speed   | Ethernet informal name | Cable name |
-|---------|------------------------|------------|
-| 10 Mbps | 10BASE-T               | Cat 3      |
-| 100 Mbps| 100BASE-T              | Cat 5      |
-| 1 Gbps  | 1000BASE-T             | Cat 5e     |
-| 10 Gbps | 10GBASE-T              | Cat 6a     |
+### Wire pair usage and pins
 
-### Wire Pair Usage and Pin Configuration
+#### Pairs used
 
-#### Wire Pair Utilization
+- **10BASE-T and 100BASE-T**
+  - Use 2 of the 4 wire pairs
+- **1000BASE-T and 10GBASE-T**
+  - Use all 4 pairs
 
-All cables have four pairs of wires, but not all Ethernet standards use them all:
+#### Straight-through and crossover
 
-- **10BASE-T and 100BASE-T**: Use two pairs
-- **1000BASE-T and 10GBASE-T**: Use all four pairs
+For 10BASE-T and 100BASE-T, only two pairs carry data.
 
-#### Straight-Through vs Crossover Cables
+**Straight-through cable**
 
-10BASE-T and 100BASE-T connections use two of the four wire/pin pairs in a UTP cable. For these connections, it's important to ensure wires connect to the correct pins.
+- Pins 1 and 2 on one end connect to pins 1 and 2 on the other
+- Pins 3 and 6 on one end connect to pins 3 and 6 on the other
+- Used between different device types (PC to switch, router to switch)
 
-**Straight-Through Cables:**
+**Crossover cable**
 
-- One pair connects to pins 1 and 2
-- Other pair connects to pins 3 and 6
-- Works well when connecting to a switch
-- Cannot directly connect two PCs (they would transmit and receive on same pins)
-
-**Crossover Cables:**
-
-- Connects opposite pin pairs
 - Pins 1 and 2 on one end connect to pins 3 and 6 on the other end
-- Allows direct communication between two PCs
+- Swaps transmit and receive pairs
+- Traditionally used to connect similar devices directly (switch to switch, PC to PC, router to router)
 
-#### Device Pin Configuration
-
-In 10BASE-T and 100BASE-T connections, different device types send and receive data using different pins:
+#### Device pin roles (10/100 Mbps)
 
 | Device type | Transmit (Tx) pins | Receive (Rx) pins |
-|-------------|-------------------|-------------------|
-| Router      | 1 and 2           | 3 and 6           |
-| Firewall    | 1 and 2           | 3 and 6           |
-| PC/Server   | 1 and 2           | 3 and 6           |
-| Switch      | 3 and 6           | 1 and 2           |
+|-------------|--------------------|-------------------|
+| Router      | 1 and 2            | 3 and 6           |
+| Firewall    | 1 and 2            | 3 and 6           |
+| PC/Server   | 1 and 2            | 3 and 6           |
+| Switch      | 3 and 6            | 1 and 2           |
+
+This is why straight-through works for PC to switch and why crossover was required between similar device types at 10/100 Mbps.
 
 #### Auto MDI-X
 
-Auto Medium-Dependent Interface Crossover (Auto MDI-X) allows devices to automatically adjust which pins to use for transmit and receive. This feature eliminates the need to worry about using straight-through vs crossover cables in modern networking.
+Modern switches and NICs support Auto MDI-X.
 
-## Fiber-Optic Connections
+- Interface detects whether transmit and receive need to be swapped
+- Automatically adjusts pin roles
+- Removes the need to worry about straight-through versus crossover in most cases
 
-If you want to transmit data over distances greater than 100 meters, copper cables are not sufficient and you must use fiber-optic cables instead. Fiber-optic cables send light signals down a glass fiber core and support much greater maximum distances than UTP cables.
+## Fiber-optic connections
 
-### Fiber-Optic Technology
+Copper UTP is limited to 100 meters and is sensitive to EMI. For longer runs and higher immunity to interference, fiber-optic cables are used.
 
-#### Signal Method
+### Fiber signaling
 
-Instead of electrical signals, fiber-optic cables use light signals transmitted through glass fibers. These cables must be handled with care due to the delicate glass fiber construction.
+- Uses light instead of electrical voltage
+- Light travels through a glass (or plastic) core
+- Requires careful handling because of the delicate fibers
 
-#### Connection Requirements
+### Duplex operation and transceivers
 
-- **Dual Cables**: Uses two cables, one for sending and one for receiving data
-- **SFP Transceivers**: Connects to Small Form Factor Pluggable (SFP) transceivers
-- **Modular Design**: Transceivers are modular and must be purchased separately from the device
-- **Proper Connection**: Important to connect transmitter to receiver correctly
+- Typical Ethernet fiber links use two strands
+  - One strand for transmit
+  - One strand for receive
+- Network devices use pluggable transceivers, for example **SFP** modules
+- Correct pairing of transmit to receive between devices is required
 
-### Cable Anatomy
+### Fiber cable structure
 
-A fiber-optic cable has four layers:
+Layers in a typical fiber cable:
 
-1. **Glass Core**: Carries the light signals
-2. **Cladding**: Reflects light back into the core
-3. **Buffer**: Protects the glass fiber
-4. **Outer Jacket**: Provides overall protection
+1. **Core**: glass that carries the light
+2. **Cladding**: reflects light back into the core
+3. **Buffer**: protects the fiber
+4. **Outer jacket**: mechanical protection
 
-### Fiber Types
+### Fiber types
 
-#### Multimode Fiber (MMF)
+#### Multimode fiber (MMF)
 
-- **Distance**: Supports several hundred meters
-- **Cost**: Less expensive
-- **Transceivers**: Uses LED-based transceivers
+- Uses LED-based optics
+- Typical distances: up to a few hundred meters depending on speed and grade
+- Lower cost than single-mode
 
-#### Single-Mode Fiber (SMF)
+#### Single-mode fiber (SMF)
 
-- **Distance**: Supports tens of kilometers
-- **Cost**: More expensive
-- **Transceivers**: Uses laser-based SFP transceivers
+- Uses laser-based optics
+- Supports distances of many kilometers
+- Transceivers and cabling are more expensive than MMF
 
-Single-mode fiber (SMF) cables support greater maximum distances than multimode fiber (MMF) cables, but the laser-based small form factor pluggable (SFP) transceivers used by SMF connections are more expensive than the LED-based transceivers used by MMF connections.
+SMF supports longer distances than MMF but with higher optics cost.
 
-## UTP vs Fiber Comparison
+## UTP versus fiber
 
-### Cost Considerations
+### Cost and distance
 
-Fiber-optic connections are more expensive than copper UTP connections, largely due to the cost of the SFP transceivers. Fiber-optic cables support much greater distances but at a higher cost, mostly because of the transceivers.
+- UTP
+  - Lower cable and interface cost
+  - Distance limit of 100 meters per segment
+- Fiber
+  - Higher cost, mainly due to SFP or other optics
+  - Much longer supported distances
 
-### Usage Patterns
+### Typical usage
 
-#### UTP Applications
+**UTP use cases**
 
-UTP connections are more common between end hosts and switches because:
+- End host to access switch
+- Short runs in offices and wiring closets
+- Most client devices have only RJ45 copper ports
 
-- **Lower Cost**: More economical for short-distance connections
-- **Sufficient Distance**: 100-meter maximum cable length is usually sufficient
-- **Device Compatibility**: Most client devices (such as PCs) only support UTP connections
+**Fiber use cases**
 
-#### Fiber Applications
+- Switch to switch uplinks
+- Links between floors and buildings
+- Data center aggregation and core
+- Where higher speeds and longer distances are needed
 
-Fiber-optic connections are more common between network infrastructure devices because:
+### EMI and security
 
-- **Extended Distance**: Network devices often connect to other devices on different floors and buildings
-- **Infrastructure Requirements**: Increased maximum cable length is essential for network backbone connections
+- UTP
+  - Susceptible to electromagnetic interference
+  - Can leak signals into nearby cables or equipment
+- Fiber
+  - Immune to EMI
+  - Does not radiate signals, which improves security and reliability
 
-### Security and EMI Considerations
+## Real-world patterns
 
-- **UTP Vulnerabilities**: UTP is vulnerable to electromagnetic interference (EMI) and can leak signals, creating potential security risks
-- **Fiber Advantages**: Fiber-optic cables are immune to EMI and do not leak signals, providing better security
+### Small office and home
 
-## Real-World Applications
+- Mostly Cat 5e or Cat 6 UTP
+- Few links approach 100 meters
+- Switches and routers often have only RJ45 ports
 
-### Small Office/Home Office
+### Enterprise networks
 
-- **UTP Dominance**: Cat 5e/6 cables for most connections
-- **Short Distances**: Rarely exceed 100-meter limitation
-- **Cost-Effective**: UTP provides adequate performance at lower cost
+- UTP from access switches to users
+- Fiber for uplinks, building risers, and backbone
+- Higher speeds and more redundancy in core and distribution layers
 
-### Enterprise Networks
+### Data centers
 
-- **Mixed Infrastructure**: UTP for end-user connections, fiber for backbone
-- **Building Interconnects**: Fiber between floors and buildings
-- **High-Performance Areas**: Fiber in server rooms and data centers
+- Mixed copper and fiber, heavy use of fiber in aggregation and core
+- 10 Gbps and higher speeds are common
+- Often multiple paths and redundant links
 
-### Data Centers
+## Quick review
 
-- **Fiber Backbone**: Extensive use of fiber for server-to-switch connections
-- **High-Speed Requirements**: 10G and higher speeds common
-- **Redundancy**: Multiple fiber paths for reliability
-
-## Summary
-
-Understanding cables, connectors, and ports is fundamental to network infrastructure:
-
-- **Standards**: IEEE 802.3 provides agreed-upon rules for Ethernet communication
-- **Binary Communication**: Networks transmit data as 0s and 1s at measured speeds in bits per second
-- **UTP Cables**: Most common for short distances, using 8P8C/RJ45 connectors with twisted wire pairs
-- **Wire Usage**: 10/100BASE-T uses two pairs, 1000/10GBASE-T uses four pairs, all limited to 100 meters
-- **Auto MDI-X**: Modern devices automatically adjust pin usage, eliminating crossover cable requirements
-- **Fiber-Optic**: Essential for distances over 100 meters, using light signals through glass cores
-- **Fiber Types**: SMF for long distances (expensive), MMF for medium distances (less expensive)
-- **Cost vs Performance**: UTP for cost-effective short connections, fiber for high-performance long connections
-
-The choice between UTP and fiber depends on distance requirements, performance needs, and budget considerations, with each technology serving specific roles in modern network infrastructure.
+- IEEE 802.3 defines Ethernet over copper and fiber.
+- Bits are sent as voltage changes on copper and as light on fiber.
+- UTP uses twisted pairs to reduce EMI and RJ45 connectors to terminate cables.
+- 10/100BASE-T use 2 pairs and 1000BASE-T and above use all 4 pairs.
+- Straight-through versus crossover mattered at 10/100 Mbps but Auto MDI-X has mostly removed this concern.
+- Fiber is used where 100 meters is not enough or EMI immunity is important.
+- MMF uses LEDs for medium distances, SMF uses lasers for long distances.
+- UTP is cheaper and common to end hosts, fiber is common for infrastructure links and long runs.

@@ -2,326 +2,239 @@
 
 ## Overview
 
-Domain Name System (DNS) is a protocol that resolves (translates) human-readable names like www.google.com into IP addresses that computers use to communicate. DNS is one of the foundational protocols of the internet and is essential for network operations. While humans prefer memorable names, computers use IP addresses, so DNS bridges this gap by providing name-to-IP-address translation. DNS enables users to access websites and network resources using easy-to-remember names instead of numeric IP addresses.
+Domain Name System (DNS) maps human readable names like `www.google.com` to IP addresses. It is critical for web browsing, email, and most application traffic. Hosts prefer to use names, but IP packets need addresses, so DNS provides the translation.
 
-## Uniform Resource Locators (URLs)
+## URLs
 
-### URL Structure
+### URL structure
 
-- URL (Uniform Resource Locator) is type of URI (Uniform Resource Identifier)
-- URI identifies resource; URL identifies resource and how to locate it
-- URL consists of multiple elements:
-  - **Scheme**: Protocol used to access resource (https, http, ftp, etc.)
-  - **Authority**: Name of server hosting resource (www.google.com)
-  - **Path**: Specific resource on server (/maps)
+A URL (Uniform Resource Locator) is a type of URI that identifies a resource and how to reach it.
 
-### URL Example
+Basic parts:
 
-- Example: `https://www.google.com/maps`
-- Scheme: `https` (protocol)
-- Authority: `www.google.com` (domain name of server)
-- Path: `/maps` (specific web page)
-- Browser uses HTTPS protocol to request /maps resource on www.google.com server
-- DNS translates www.google.com domain name into IP address
+- Scheme: protocol in use, for example `https`, `http`, `ftp`
+- Authority: server name, for example `www.google.com`
+- Path: specific resource, for example `/maps`
 
-### Default Behavior
+### URL example
 
-- If scheme not specified, browser assumes default (usually HTTPS)
-- If path not specified, browser shows default page (index.html, index.php, etc.)
+For `https://www.google.com/maps`:
 
-## DNS Name Resolution Process
+- Scheme: `https`
+- Authority: `www.google.com`
+- Path: `/maps`
 
-### DNS Cache
+The browser uses HTTPS to request `/maps` from `www.google.com`. DNS is used to translate `www.google.com` into an IP address.
 
-- Device first checks DNS cache for matching entry
-- DNS cache temporarily stores previously resolved names and IP addresses
-- If matching entry found, process complete; no need to query DNS server
-- DNS cache exists at multiple levels:
-  - Operating system maintains cache
-  - Applications like web browsers maintain own cache
-- View Windows DNS cache with `ipconfig /displaydns` command
+### Default behavior
 
-### DNS Query Process
+- If the scheme is omitted, browsers normally assume HTTPS
+- If the path is omitted, the server returns a default page such as `index.html`
 
-- If no matching entry in cache, device sends DNS query to DNS server
-- DNS query asks server to resolve name to IP address
-- DNS server replies with IP address or error message
-- After successful resolution, device stores mapping in DNS cache
-- Subsequent requests for same name use cached information
+## Name resolution process
 
-### DNS Port and Protocol
+### Local cache and hosts file
 
-- DNS queries sent to port 53 on DNS server
-- DNS can use both TCP and UDP as Layer 4 protocol
-- UDP most common for standard DNS queries and responses
-- TCP used in certain situations (e.g., when response exceeds certain size)
-- DNS servers listen on port 53 for both TCP and UDP
+Before sending a DNS query, a host checks local sources:
 
-### Hosts File
+- Application cache, for example browser cache
+- Operating system DNS cache
+- Hosts file entries, for example on Windows `C:\Windows\System32\drivers\etc\hosts`
 
-- Many devices have hosts file with IP address to hostname mappings
-- Location varies by OS (Windows: C:\Windows\System32\drivers\etc\hosts)
-- Device checks hosts file before sending DNS request
-- Entirely separate from DNS resolution process
-- Before DNS existed, devices relied on hosts file
-- Lack of scalability led to creation of DNS
-- Hosts file still present but use is limited
+If a matching entry is found, no query is sent to a DNS server.
 
-## DNS Hierarchy
+### Query to DNS server
 
-### Hierarchical Structure
+If there is no match in local sources:
 
-- DNS is hierarchical naming system organized in tree-like structure
-- Domain is subtree of structure under administrative control
-- At top is root domain, represented by single dot (.)
-- Under root domain are various top-level domains (TLDs)
-- Under each TLD are various second-level domains (SLDs)
-- Under each SLD can be third-level domains, fourth-level domains, etc.
-- Each domain is subdomain of domains above it in hierarchy
+- The host sends a DNS query to the configured DNS server
+- The server replies with an IP address or an error
+- The result is stored in the local DNS cache with a time to live (TTL)
 
-### Top-Level Domains
+### Port and transport
 
-- Most common TLD is com
-- Other TLDs: net, org, edu, gov, country codes, etc.
-- Each TLD has various second-level domains under it
-- Example: google is second-level domain under com TLD
+- DNS servers listen on port 53
+- UDP is used for most queries and responses
+- TCP is used when responses are too large for UDP or for some special cases
 
-### Fully Qualified Domain Names (FQDNs)
+## DNS hierarchy
 
-- Complete name of host on internet is FQDN
-- Written with dot separating each part
-- Example: `www.google.com.` (note final dot)
-- Final dot represents root domain (often omitted)
-- Domain name without final dot is partially qualified domain name (PQDN)
-- FQDN specifies exact location in DNS hierarchy
+### Structure
 
-### Partially Qualified Domain Names (PQDNs)
+DNS uses a hierarchical, tree like naming structure:
 
-- PQDN is domain name that doesn't include all information about host's location
-- Example: `www` is PQDN within domain `business.com`
-- FQDN would be `www.business.com`
-- PQDN identifies host within its domain but not globally
+- Root domain at the top, written as a single dot `.`
+- Top level domains (TLDs) under the root, for example `com`, `net`, `org`, country codes
+- Second level domains under each TLD, for example `google` under `com`
+- Additional levels as needed, for example `www.google.com`
 
-### Terminology
+Each node in the tree is a domain and may contain subdomains.
 
-- **Domain name**: Region of administrative control (example.com) or particular node (srv1.example.com)
-- **Hostname**: Identifier for specific device (srv1 or srv1.example.com)
-- **FQDN**: Complete name specifying exact location in DNS hierarchy
-- **PQDN**: Partial name that doesn't include all hierarchy information
+### FQDN and PQDN
 
-## DNS Lookup Types
+- Fully Qualified Domain Name (FQDN):
+  - Full path from host to root
+  - Often written with a trailing dot to show the root, for example `www.google.com.`
+- Partially Qualified Domain Name (PQDN):
+  - Does not include the full path
+  - Interpreted relative to a default domain or search list
 
-### Recursive Queries
+Example:
 
-- Client sends recursive query to DNS server
-- Recursive query asks for definite answer: IP address or error message
-- DNS server responsible for resolving recursive queries is recursive resolver
-- Recursive resolver performs iterative queries to find answer
-- Client doesn't perform iterative queries itself
+- Domain: `business.com`
+- Host within the domain: `www`
+- PQDN: `www`
+- FQDN: `www.business.com`
 
-### Iterative Queries
+### Common terms
 
-- Recursive resolver sends iterative queries to other DNS servers
-- Iterative query can be answered with:
-  - IP address, or
-  - Referral to another DNS server
-- Server says "I don't know, but try this other server"
-- Process continues until authoritative server is reached
+- Domain name: a portion of the namespace such as `example.com`
+- Hostname: the label for a specific device, for example `srv1`
+- FQDN: `srv1.example.com`
+- PQDN: `srv1` when used inside the `example.com` domain
 
-### Name Resolution Example
+## Query types and server roles
 
-1. Client sends recursive query to recursive resolver (e.g., 8.8.8.8)
-2. Recursive resolver checks cache; if not found, starts iterative process
-3. Recursive resolver queries root DNS server (iterative query)
-4. Root server refers to TLD server (e.g., com TLD server)
-5. Recursive resolver queries TLD server (iterative query)
-6. TLD server refers to authoritative DNS server for domain
-7. Recursive resolver queries authoritative server (iterative query)
-8. Authoritative server responds with IP address
-9. Recursive resolver replies to client's recursive query with IP address
-10. Client uses IP address to communicate with destination
+### Recursive and iterative queries
 
-### DNS Server Types
+- Recursive query:
+  - Sent by a client to a DNS server (recursive resolver)
+  - Asks for a complete answer or an error
+  - The client does not contact other servers directly
+- Iterative query:
+  - Sent by a resolver to other DNS servers
+  - Can be answered with an address or with a referral to another server
 
-- **Root DNS server**: DNS server at top of DNS hierarchy
-- **TLD server**: DNS server responsible for specific top-level domain
-- **Authoritative DNS server**: Server holding definitive set of records for specific domain
-- **Recursive resolver**: DNS server that resolves clients' recursive queries by performing iterative queries
+### Server types
 
-### Caching
+- Root server:
+  - Knows the TLD servers
+  - Does not hold all records
+- TLD server:
+  - Knows the authoritative servers for domains under a TLD, for example `com`
+- Authoritative server:
+  - Holds the records for a specific domain
+  - Responds with final answers for that domain
+- Recursive resolver:
+  - Handles client queries
+  - Performs iterative queries to other servers
 
-- Caching used at every step of name resolution process
-- Reduces number of DNS queries needed
-- If recursive resolver has cached entry, it replies immediately
-- Caching improves performance and reduces DNS server load
+### Example resolution flow
 
-## DNS Record Types
+1. Client sends a recursive query for `www.example.com` to the recursive resolver
+2. Resolver checks its cache
+3. If not cached, resolver sends iterative query to a root server
+4. Root server responds with a referral to the `com` TLD server
+5. Resolver queries the `com` TLD server
+6. TLD server responds with a referral to the authoritative server for `example.com`
+7. Resolver queries the authoritative server
+8. Authoritative server responds with an A or AAAA record
+9. Resolver caches the reply and returns the IP address to the client
 
-### A Records
+Caching at each step reduces future query traffic and speeds up resolution.
 
-- Map domain name to IPv4 address
-- Example: example.com -> 192.0.2.1
-- Most common type of DNS record
-- Used for standard IPv4 name resolution
+## Common record types
 
-### AAAA Records
+### Address records
 
-- Map domain name to IPv6 address
-- Example: example.com -> 2001:db8::1
-- Called quad-A records (IPv6 addresses are quadruple length of IPv4)
-- Used for IPv6 name resolution
+- A record:
+  - Maps a name to an IPv4 address
+  - Example: `example.com` to `192.0.2.1`
+- AAAA record:
+  - Maps a name to an IPv6 address
+  - Example: `example.com` to `2001:db8::1`
 
-### CNAME Records
+### Alias and mail records
 
-- Create alias for domain name
-- Map one domain name to another domain name
-- Example: www.example.com -> example.com
-- Common use: map www.example.com to example.com
-- No A record exists for aliased name; points to canonical name
+- CNAME record:
+  - Creates an alias from one name to another name
+  - Example: `www.example.com` as an alias for `example.com`
+- MX record:
+  - Identifies mail servers for a domain
+  - Can include preferences to rank multiple mail servers
 
-### MX Records
+### Name server and reverse records
 
-- Specify domain's mail servers
-- Example: example.com -> mail1.example.com
-- Used for email delivery
-- Multiple MX records can specify multiple mail servers with priorities
+- NS record:
+  - Identifies the authoritative name servers for a domain
+- PTR record:
+  - Maps an IP address back to a name
+  - Used for reverse DNS lookups
 
-### NS Records
+### SOA and TTL
 
-- Specify domain's authoritative DNS servers
-- Example: example.com -> ns1.example.com
-- Identifies which DNS servers are authoritative for domain
-- Used to delegate DNS authority
-
-### PTR Records
-
-- Map IP address to domain name (reverse DNS lookup)
-- Example: 192.0.2.1 -> example.com
-- Unique: maps IP to name instead of name to IP
-- Used for reverse DNS lookups
-
-### SOA Records
-
-- Start of Authority record
-- Stores administrative information about domain
-- Includes: contact information, serial number, refresh intervals, etc.
-- Contact information format: admin.example.com (first dot replaced with @ for email)
-
-### DNS Propagation
-
-- DNS propagation delay: time for DNS record changes to be reflected across internet
-- Generally takes few minutes to 48-72 hours
-- Time to Live (TTL) value determines how long records are cached
-- Lower TTL means more frequent refreshes
-- Reduce TTL values before making changes to minimize propagation delay
+- SOA record:
+  - Start of Authority for a zone
+  - Contains administrative data, including contact and serial number
+- TTL:
+  - Time to live in seconds
+  - Specifies how long records can be cached before they must be refreshed
+  - Low TTL gives faster propagation of changes but more query load
 
 ## DNS on Cisco IOS
 
-### DNS Client Configuration
+### Client side DNS
 
-- Enable DNS queries: `ip domain lookup` (enabled by default)
-- Can also use: `ip domain-lookup`
-- Disable with: `no ip domain lookup`
-- Configure DNS server: `ip name-server ip-address`
-- Can specify multiple DNS servers (up to six)
-- Either single command: `ip name-server 8.8.8.8 1.1.1.1`
-- Or separate commands for each server
-- Router queries servers in order if first fails
+- Enable DNS lookups:
+  - `ip domain lookup` or `ip domain-lookup` (on by default)
+- Configure DNS servers:
+  - `ip name-server <ip-address>`
+  - Up to six servers can be configured
+- Configure default domain:
+  - `ip domain name example.com`
+  - Appended to hostnames if no domain is given
 
-### Using DNS in Other Configurations
+With these settings, commands can use names instead of IP addresses, for example:
+  
+- `ping www.example.com`
+- `ntp server time1.google.com`
 
-- Can use domain names instead of IP addresses in other commands
-- Example: `ntp server time1.google.com` instead of IP address
-- Router resolves domain name to IP address using configured DNS server
+### Router as DNS server
 
-### DNS Server Configuration
+- Enable DNS server feature:
+  - `ip dns server`
+- Configure upstream DNS servers:
+  - `ip name-server <ip-address>`
+- The router then:
+  - Accepts queries from clients
+  - Forwards queries to upstream servers
+  - Caches responses
 
-- Configure router as DNS server: `ip dns server`
-- Router responds to clients' DNS queries
-- Router queries other DNS servers (configured with `ip name-server`) to resolve queries
-- Router caches responses for commonly accessed websites
-- Performance benefit: router can respond to multiple clients' queries for same name using cache
-- Router forwards clients' DNS queries to configured DNS servers
-- Both client-to-router and router-to-server queries are recursive queries
+This provides basic caching DNS for a small network.
 
-### Manual Name-to-IP Mappings
+### Static name to address mappings
 
-- Configure default domain name: `ip domain name name`
-- Can also use: `ip domain-name name`
-- Router appends default domain name to queries that specify only hostname
-- Configure manual mappings: `ip host name ip-address`
-- Useful for hosts in internal network
-- Allows hosts to communicate using hostnames instead of IP addresses
+- Configure manual mappings:
+  - `ip host SRV1 192.0.2.10`
+  - `ip host FW1 198.51.100.2`
+- These entries are stored locally on the router
+- Helpful for internal devices that do not have public DNS entries
 
-### DNS Verification
+### Verification
 
-- View all name-to-IP mappings: `show hosts`
-- Shows both manually configured mappings and dynamically learned mappings
-- Manually configured: marked as permanent (perm)
-- Dynamically learned: marked as temporary (temp)
-- Shows default domain name and name servers
+- `show hosts`
+  - Displays static and learned name to address mappings
+  - Shows name servers in use and the default domain
 
-## Real-World Applications
+## Troubleshooting notes
 
-- **Web browsing**: Translate website names to IP addresses
-- **Email**: Resolve mail server domain names
-- **Network services**: Access services using memorable names
-- **Internal networks**: Use hostnames for internal resources
-- **Load balancing**: Multiple A records for same domain name
-- **Service discovery**: Find services by name instead of IP
-- **Security**: Reverse DNS lookups for authentication
-- **Network management**: Use names instead of IP addresses in configurations
+- If names do not resolve:
+  - Check `ip name-server` configuration
+  - Confirm reachability of DNS servers with `ping`
+- If wrong IPs appear:
+  - Check local and router caches
+  - Consider TTL and recent changes
+- If internal names fail:
+  - Verify static `ip host` entries or internal DNS server records
 
-## Troubleshooting
+## Quick review
 
-### Common Issues
-
-- **Name not resolving**: Verify DNS server is configured and reachable
-- **Wrong IP address**: Check DNS cache; may need to flush cache
-- **Slow resolution**: Check DNS server response times
-- **Internal names not working**: Verify manual mappings or internal DNS server
-
-### Troubleshooting Steps
-
-1. Verify DNS server configuration: `show hosts`
-2. Test DNS resolution: Ping domain name
-3. Check DNS server reachability: Ping DNS server IP address
-4. Verify manual mappings: `show hosts` for permanent entries
-5. Check default domain: Verify `ip domain name` configuration
-6. Flush DNS cache: May need to clear cache on client device
-
-## Best Practices
-
-- Configure multiple DNS servers for redundancy
-- Use reliable DNS servers (e.g., 8.8.8.8, 1.1.1.1)
-- Configure internal DNS server for internal network resources
-- Use manual mappings for critical internal hosts
-- Configure default domain name for convenience
-- Monitor DNS resolution performance
-- Document DNS server addresses and configurations
-- Use DNS caching to improve performance
-- Consider security implications of DNS queries
-
-## Summary
-
-- DNS resolves (translates) names like www.google.com to IP addresses
-- URL consists of scheme (protocol), authority (domain name), and path (resource)
-- Device checks DNS cache first; if not found, sends DNS query to DNS server
-- DNS queries sent to port 53; can use TCP or UDP (UDP most common)
-- Device checks hosts file before sending DNS request
-- DNS is hierarchical naming system with root domain, TLDs, SLDs, and subdomains
-- FQDN specifies exact location in DNS hierarchy; PQDN is partial name
-- Recursive queries ask for definite answer; iterative queries can return referrals
-- Root server refers to TLD server; TLD server refers to authoritative server
-- Authoritative server holds definitive records for domain
-- Recursive resolver performs iterative queries to resolve client's recursive query
-- Caching used at every step to reduce DNS queries
-- DNS record types: A (IPv4), AAAA (IPv6), CNAME (alias), MX (mail), NS (name server), PTR (reverse), SOA (authority)
-- Enable DNS on Cisco IOS with `ip domain lookup` (enabled by default)
-- Configure DNS server with `ip name-server ip-address`
-- Configure router as DNS server with `ip dns server`
-- Configure default domain with `ip domain name name`
-- Configure manual mappings with `ip host name ip-address`
-- View mappings with `show hosts` command
-- DNS propagation delay can take minutes to days depending on TTL values
-
+- DNS maps names to IP addresses using a hierarchical structure and multiple server roles.
+- URLs include scheme, authority, and path. DNS is used to resolve the authority part.
+- Name resolution checks local caches and hosts files before sending queries.
+- Port 53 is used for DNS over UDP and TCP.
+- Recursive resolvers answer client queries by performing iterative queries to root, TLD, and authoritative servers.
+- Key record types: A, AAAA, CNAME, MX, NS, PTR, SOA.
+- TTL controls how long records are cached and affects propagation time for changes.
+- On Cisco IOS, DNS client features use `ip domain lookup`, `ip name-server`, and `ip domain name`.
+- Routers can act as simple caching DNS servers with `ip dns server` and static mappings via `ip host`.

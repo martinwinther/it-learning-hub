@@ -2,308 +2,286 @@
 
 ## Overview
 
-Ethernet LAN switching is a fundamental concept in computer networking that enables efficient communication within local area networks. Switches operate at Layer 2 (Data Link Layer) of the OSI model and use MAC addresses to make intelligent forwarding decisions, creating dedicated communication paths between devices and improving network performance compared to older hub-based networks.
+Ethernet LAN switching forwards frames inside a local network based on MAC addresses. Switches operate at Layer 2 and build a MAC address table that maps MAC addresses to ports. This allows efficient forwarding, separation of collision domains, and better performance than hubs.
 
-## Ethernet Fundamentals
+## Ethernet fundamentals
 
-### What is Ethernet?
+### Ethernet definition
 
-Ethernet is a family of networking technologies defined by IEEE 802.3 standards that govern how devices communicate over wired connections. It specifies both the physical characteristics of cables and connectors as well as the data formatting rules for communication.
+- Ethernet is defined by IEEE 802.3
+- Specifies:
+  - Physical media and signaling
+  - Frame format and addressing
+  - Basic access rules on a shared medium
 
-### Ethernet Frame Structure
+### Ethernet frame fields
 
-Ethernet frames contain several key components:
+Key fields in an Ethernet frame:
 
-- **Preamble**: Synchronization pattern (7 bytes)
-- **Start Frame Delimiter**: Marks beginning of frame (1 byte)
-- **Destination MAC Address**: Target device address (6 bytes)
-- **Source MAC Address**: Sending device address (6 bytes)
-- **EtherType/Length**: Protocol type or frame length (2 bytes)
-- **Data**: Actual payload (46-1500 bytes)
-- **Frame Check Sequence**: Error detection (4 bytes)
+- Destination MAC address
+- Source MAC address
+- EtherType or length
+- Data
+- Frame Check Sequence (FCS)
 
-### MAC Addresses
+The switch uses destination MAC to decide where to forward. FCS is used to detect errors. Preamble and start frame delimiter exist on the wire but are not usually shown in command output.
 
-Media Access Control (MAC) addresses are unique 48-bit identifiers assigned to network interfaces:
+### MAC addresses
 
-- **Format**: 12 hexadecimal digits (e.g., 00:1A:2B:3C:4D:5E)
-- **Organizationally Unique Identifier (OUI)**: First 3 bytes identify manufacturer
-- **Device Identifier**: Last 3 bytes are unique to the device
-- **Unicast vs Multicast**: First bit determines address type
-- **Locally Administered**: Second bit indicates if address is locally assigned
+- 48 bit identifiers written in hexadecimal
+- Often shown as six byte pairs, for example `00:11:22:33:44:55`
+- First part: Organizationally Unique Identifier (OUI), identifies the vendor
+- Second part: device specific value
+- Stored in network interface hardware but can be overridden in software
+- Unicast, multicast, and broadcast types exist
 
-## Switching Concepts
+## Switching behavior
 
-### How Switches Work
+### MAC address table
 
-Switches learn MAC addresses by examining the source address of incoming frames and maintain a MAC address table (also called CAM table) that maps MAC addresses to switch ports.
+Switches keep a MAC address table (CAM table) that maps MAC addresses to ports and VLANs.
 
-#### Learning Process
+Each entry includes:
 
-1. **Frame Reception**: Switch receives frame on a port
-2. **Source Learning**: Switch records source MAC address and port in MAC table
-3. **Destination Lookup**: Switch checks MAC table for destination address
-4. **Forwarding Decision**: Switch forwards frame based on lookup result
+- MAC address
+- Interface
+- VLAN
+- Type (dynamic or static)
 
-#### Forwarding Decisions
+Dynamic entries:
 
-- **Known Unicast**: Forward frame to specific port
-- **Unknown Unicast**: Flood frame to all ports except source port
-- **Broadcast**: Flood frame to all ports except source port
-- **Multicast**: Forward based on multicast configuration
+- Learned from sources of incoming frames
+- Aged out after an idle timer (default 300 seconds on many switches)
 
-### MAC Address Table
+Static entries:
 
-The MAC address table contains dynamic entries learned from traffic and static entries configured by administrators:
+- Manually configured
+- Not aged out
+- Used in some security and special cases
 
-#### Dynamic Entries
+### Learning and forwarding
 
-- **Learning**: Automatically populated from frame source addresses
-- **Aging**: Entries expire after inactivity (default 300 seconds)
-- **Port Movement**: Entries update when devices move to different ports
+When a frame arrives:
 
-#### Static Entries
+1. Switch records the source MAC and incoming port in the MAC table
+2. Switch looks up the destination MAC and VLAN in the table
+3. If found (known unicast):
+   - Frame is forwarded out the single matching port
+4. If not found (unknown unicast):
+   - Frame is flooded out all ports in the same VLAN except the incoming port
 
-- **Manual Configuration**: Administratively configured entries
-- **Permanent**: Never age out
-- **Security**: Prevents unauthorized devices on specific ports
+Broadcast frames are flooded to all ports in the VLAN except the source port. Multicast behavior is similar unless special multicast features are configured.
 
-### Switch Operation Modes
+### Aging and movement
 
-#### Store-and-Forward
+- If a device is silent, its MAC entry eventually ages out
+- If a frame with a known MAC source arrives on a different port in the same VLAN, the switch updates the entry to the new port
 
-- **Process**: Receives entire frame before forwarding
-- **Error Checking**: Validates frame integrity
-- **Latency**: Higher due to complete frame reception
-- **Reliability**: Better error detection
+## Switching methods
 
-#### Cut-Through
+### Store and forward
 
-- **Process**: Begins forwarding after reading destination address
-- **Speed**: Lower latency
-- **Error Handling**: Limited error detection
-- **Performance**: Faster but less reliable
+- Receives the entire frame before forwarding
+- Verifies FCS
+- Drops frames with errors
+- Higher latency than cut through but better error handling
+- Default on modern Cisco switches
 
-#### Fragment-Free
+### Cut through
 
-- **Process**: Reads first 64 bytes before forwarding
-- **Compromise**: Balance between speed and error detection
-- **Collision Detection**: Catches most errors in first 64 bytes
+- Starts forwarding after reading destination MAC
+- Lower latency
+- Forwards bad frames because FCS is not checked before forwarding
+- Less common in general purpose switches
 
-## VLANs (Virtual LANs)
+### Fragment free
 
-### VLAN Concepts
+- Reads first 64 bytes before forwarding
+- Catches most collision related errors
+- Trade off between speed and error checking
 
-Virtual LANs logically segment a physical switch into multiple broadcast domains, allowing network administrators to group devices regardless of their physical location.
+## VLANs
 
-#### Benefits
+### VLAN concepts
 
-- **Security**: Isolate traffic between different groups
-- **Performance**: Reduce broadcast domain size
-- **Flexibility**: Group devices by function rather than location
-- **Management**: Easier network administration
+Virtual LANs split a switch into multiple Layer 2 broadcast domains.
 
-#### VLAN Types
+Effects:
 
-- **Data VLANs**: Carry user-generated traffic
-- **Voice VLANs**: Dedicated to IP telephony traffic
-- **Management VLANs**: Used for switch management traffic
-- **Native VLANs**: Default VLAN for untagged traffic
+- Each VLAN has its own MAC table and broadcast domain
+- Broadcasts stay inside a VLAN
+- Devices in different VLANs need a router or Layer 3 switch to communicate
 
-### VLAN Configuration
+Benefits:
 
-#### Creating VLANs
+- Traffic isolation and basic security
+- Smaller broadcast domains
+- Flexible logical grouping of devices
 
-```text
-Switch(config)# vlan 10
-Switch(config-vlan)# name Sales
-Switch(config-vlan)# exit
-Switch(config)# vlan 20
-Switch(config-vlan)# name Engineering
-```
+### VLAN types
 
-#### Assigning Ports to VLANs
+Common VLAN roles:
 
-```text
-Switch(config)# interface fastethernet 0/1
-Switch(config-if)# switchport mode access
-Switch(config-if)# switchport access vlan 10
-Switch(config-if)# exit
-```
+- Data VLAN
+- Voice VLAN
+- Management VLAN
+- Native VLAN on trunks
 
-#### VLAN Trunking
+VLAN 1 is the default VLAN on many Cisco switches but is often avoided for user traffic in production networks.
 
-Trunk ports carry traffic for multiple VLANs using VLAN tags:
+### Access ports
 
-- **802.1Q**: Industry standard for VLAN tagging
-- **ISL**: Cisco proprietary (deprecated)
-- **Native VLAN**: Untagged traffic on trunk ports
+Access ports carry traffic for a single VLAN.
+
+Basic configuration:
 
 ```text
-Switch(config)# interface fastethernet 0/24
-Switch(config-if)# switchport mode trunk
-Switch(config-if)# switchport trunk allowed vlan 10,20,30
+interface FastEthernet0/1
+ switchport mode access
+ switchport access vlan 10
 ```
+
+The switch forwards untagged frames from this port in VLAN 10.
+
+### Trunk ports and 802.1Q
+
+Trunks carry traffic for multiple VLANs over one link.
+
+- 802.1Q is the common tagging method
+- Each frame carries a VLAN tag, except frames in the native VLAN
+
+Basic trunk configuration:
+
+```text
+interface FastEthernet0/24
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30
+```
+
+Notes:
+
+- Native VLAN frames are sent untagged on the trunk
+- Native VLAN should match on both sides of the trunk
+- Only allowed VLANs can pass over the trunk
 
 ## Spanning Tree Protocol (STP)
 
 ### Purpose
 
-Spanning Tree Protocol prevents loops in redundant network topologies by creating a loop-free logical topology while maintaining redundancy.
+Redundant links create Layer 2 loops. STP prevents loops by blocking some links while leaving redundancy available.
 
-#### Problems Without STP
+Problems without STP:
 
-- **Broadcast Storms**: Loops cause continuous frame forwarding
-- **MAC Address Table Instability**: Constant table updates
-- **Multiple Frame Copies**: Duplicate frames reaching destinations
+- Broadcast storms
+- MAC table instability
+- Multiple copies of frames
 
-### STP Operation
+### Root bridge
 
-#### Root Bridge Election
+STP selects a single root bridge.
 
-- **Bridge ID**: Combination of priority and MAC address
-- **Lowest Bridge ID**: Becomes root bridge
-- **Priority**: Configurable (default 32768)
-- **MAC Address**: Tiebreaker for equal priorities
+- Each switch has a bridge ID (priority plus MAC)
+- Lowest bridge ID becomes root
+- Default priority is 32768
+- Administrators usually lower priority on the desired root
 
-#### Port States
+### Port roles and states
 
-- **Blocking**: Receives BPDUs but doesn't forward traffic
-- **Listening**: Participates in STP but doesn't learn MAC addresses
-- **Learning**: Learns MAC addresses but doesn't forward traffic
-- **Forwarding**: Normal operation, forwards traffic
-- **Disabled**: Administratively disabled
+Key roles:
 
-#### Port Roles
+- Root port
+  - One per non root switch
+  - Best path toward the root bridge
+- Designated port
+  - One per segment
+  - Best path for that segment toward the root
+- Alternate or blocked port
+  - Backup path that does not forward user traffic
 
-- **Root Port**: Best path to root bridge on each switch
-- **Designated Port**: Best path on each segment
-- **Blocked Port**: Prevents loops
+Common states in classic STP:
 
-### STP Variants
+- Blocking
+- Listening
+- Learning
+- Forwarding
+- Disabled
 
-#### RSTP (Rapid Spanning Tree Protocol)
+RSTP (Rapid STP) collapses some states but the basic idea is the same: some ports forward while others block to prevent loops.
 
-- **Faster Convergence**: Reduced from 30-50 seconds to 1-3 seconds
-- **Port States**: Blocking, Learning, Forwarding
-- **Port Roles**: Root, Designated, Alternate, Backup
+### STP variants
 
-#### MSTP (Multiple Spanning Tree Protocol)
+- STP (802.1D): original version
+- RSTP (802.1w): faster convergence, default on many modern switches
+- MSTP (802.1s): supports multiple instances mapped to VLANs
 
-- **Multiple Instances**: Different VLANs can use different trees
-- **Load Balancing**: Traffic distribution across multiple paths
-- **Complexity**: More configuration required
+For CCNA, focus on the concepts of root bridge selection, port roles, and loop prevention. Detailed MSTP configuration is beyond the basics.
 
-## Switch Security
+## Basic switch security
 
-### Port Security
+### Port security
 
-Port security limits the number of MAC addresses allowed on a switch port:
+Port security restricts what MAC addresses can use an access port.
 
-#### Configuration
-
-```text
-Switch(config)# interface fastethernet 0/1
-Switch(config-if)# switchport port-security
-Switch(config-if)# switchport port-security maximum 2
-Switch(config-if)# switchport port-security violation shutdown
-```
-
-#### Violation Actions
-
-- **Protect**: Drop frames from unknown MAC addresses
-- **Restrict**: Drop frames and send SNMP trap
-- **Shutdown**: Disable port and send SNMP trap
-
-### DHCP Snooping
-
-Prevents unauthorized DHCP servers from operating on the network:
+Example:
 
 ```text
-Switch(config)# ip dhcp snooping
-Switch(config)# ip dhcp snooping vlan 10
-Switch(config)# interface fastethernet 0/1
-Switch(config-if)# ip dhcp snooping trust
+interface FastEthernet0/1
+ switchport mode access
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security violation shutdown
 ```
 
-### Dynamic ARP Inspection (DAI)
+Violation actions:
 
-Validates ARP packets against DHCP snooping database:
+- Protect
+- Restrict
+- Shutdown
+
+Port security is usually applied on access ports toward end hosts.
+
+### DHCP snooping and DAI (brief)
+
+- DHCP snooping:
+  - Identifies trusted DHCP sources
+  - Builds a binding table of IP, MAC, VLAN, and interface
+- Dynamic ARP Inspection (DAI):
+  - Uses the DHCP snooping binding table
+  - Drops ARP messages that do not match
+
+Detailed behavior of DHCP snooping and DAI is covered in separate notes. At switching level, remember they are features configured on access switches to protect against DHCP and ARP based attacks.
+
+## Troubleshooting switching issues
+
+### Common problems
+
+- Port down or err disabled
+- Wrong VLAN on access port
+- Trunk not negotiated or wrong allowed VLAN list
+- Port blocked by STP
+- Duplex or speed mismatch
+
+### Useful show commands
+
+Typical checks:
 
 ```text
-Switch(config)# ip arp inspection vlan 10
-Switch(config)# interface fastethernet 0/1
-Switch(config-if)# ip arp inspection trust
+show mac address-table
+show vlan brief
+show interfaces status
+show interfaces switchport
+show spanning-tree
+show port-security
 ```
 
-## Troubleshooting Switching Issues
+These commands help confirm VLAN membership, trunk status, STP state, and learned MAC addresses.
 
-### Common Problems
+## Quick review
 
-#### Connectivity Issues
-
-- **Port Status**: Check if port is up/up
-- **VLAN Assignment**: Verify correct VLAN configuration
-- **Trunk Configuration**: Ensure proper trunk setup
-- **STP Blocking**: Check for blocked ports
-
-#### Performance Issues
-
-- **Duplex Mismatch**: Verify duplex settings
-- **Speed Mismatch**: Check speed configuration
-- **Collision Domains**: Identify collision issues
-- **Broadcast Storms**: Monitor broadcast traffic
-
-### Useful Commands
-
-#### Verification Commands
-
-```text
-Switch# show mac address-table
-Switch# show vlan brief
-Switch# show interfaces status
-Switch# show spanning-tree
-Switch# show port-security
-```
-
-#### Debugging Commands
-
-```text
-Switch# debug spanning-tree events
-Switch# debug ethernet switching
-Switch# show mac address-table dynamic
-```
-
-## Real-World Applications
-
-### Small Office Networks
-
-- **Basic Switching**: Simple VLAN segmentation
-- **Port Security**: Prevent unauthorized access
-- **STP**: Redundant uplinks to core switch
-
-### Enterprise Networks
-
-- **Advanced VLANs**: Department-based segmentation
-- **Trunking**: Inter-switch VLAN communication
-- **Security Features**: DHCP snooping, DAI, port security
-- **Redundancy**: Multiple spanning tree instances
-
-### Data Center Networks
-
-- **High-Performance Switching**: Low-latency switching
-- **Virtualization Support**: VM-aware switching
-- **Advanced Features**: VXLAN, FabricPath
-- **Scalability**: Large MAC address tables
-
-## Summary
-
-Ethernet LAN switching is essential for modern network operation:
-
-- **MAC Address Learning**: Switches build forwarding tables automatically
-- **VLAN Segmentation**: Logical network separation for security and performance
-- **Loop Prevention**: STP prevents network loops while maintaining redundancy
-- **Security Features**: Port security, DHCP snooping, and DAI protect networks
-- **Performance Optimization**: Dedicated communication paths improve network efficiency
-
-Understanding these concepts is crucial for CCNA certification and effective network administration, providing the foundation for building scalable, secure, and efficient local area networks.
+- Switches forward frames using MAC address tables built from source addresses.
+- Unknown unicast, broadcast, and some multicast frames are flooded within a VLAN.
+- VLANs create separate broadcast domains on a switch. Inter VLAN traffic needs Layer 3 routing.
+- Access ports carry one VLAN. Trunk ports carry multiple VLANs with 802.1Q tags and a native VLAN.
+- STP prevents Layer 2 loops by blocking some ports and electing a root bridge.
+- Basic switch security features include port security, DHCP snooping, and Dynamic ARP Inspection.
+- Core troubleshooting uses show commands to check MAC tables, VLANs, interfaces, and STP.  

@@ -1,134 +1,119 @@
 # Network Devices
 
-## What is a Computer Network?
+## Computer networks
 
-A telecommunications network that allows nodes to share resources.
+A computer network is a telecommunications system that allows nodes to share resources.
 
-### Key Components
+### Key components
 
-- **Node**: Any device that connects to a network
-  - Examples: Computer, iPhone, tablet, printer, IoT device
-- **Resource**: Anything that can be used or accessed over the network
-  - Examples: webpages, network printers, cloud-based software, files, databases
+- **Node**  
+  Any device that connects to a network.  
+  Examples: PCs, laptops, phones, tablets, printers, IP cameras, IoT devices.
 
-### Network Purpose
+- **Resource**  
+  Anything that can be used or accessed over the network.  
+  Examples: web pages, file shares, databases, printers, cloud applications.
 
-Networks enable communication and resource sharing between connected devices, allowing organizations and individuals to:
+Networks exist so nodes can communicate and share resources efficiently.
 
-- Share data and information
-- Access remote services and applications
-- Collaborate across geographical locations
-- Centralize resources for efficient management
+## Clients and servers
 
-## Types of Network Devices
+Clients and servers describe roles, not specific hardware types.
 
-### Clients and Servers
+- **Client**  
+  Requests information or a service.
 
-Clients and servers are defined by their relationship to each other, not by specific hardware types.
+- **Server**  
+  Provides information or a service.
 
-#### Client-Server Relationship
+The same device can act as both client and server at different times.
 
-- **Client**: Requests information or service
-- **Server**: Sends information or provides a service
-- **Dynamic Roles**: Almost any node can be both a server and a client depending on the context
+Examples:
 
-#### Examples
+- TV streaming a movie from a video platform  
+- Phone using a social media app that talks to backend servers  
+- PC opening files from a file server
 
-- Client: TV
-- Server: Netflix server that hosts movies
+## Switches
 
-- Client: iPhone
-- Server: X servers that host tweets
+Switches operate at Layer 2 (data link layer) and provide local connectivity inside a LAN.
 
-- Client: PC using Excel
-- Server: Enterprise server containing spreadsheets and files
+### Switch functions
 
-### Switches
+- Connect end devices within a LAN
+- Forward frames based on destination MAC address
+- Build a MAC address table by learning source MAC addresses
+- Keep each port in its own collision domain
 
-Network switches operate at Layer 2 (Data Link Layer) of the OSI model and facilitate communication within a local area network (LAN).
+Devices usually do not interact with the switch itself. The switch forwards traffic between devices in the same VLAN.
 
-#### Switch Functions
+### Scope
 
-- **Device Connectivity**: Devices connected to a switch can communicate to each other via the switch
-- **Traffic Forwarding**: The switch forwards traffic between connected devices based on MAC addresses
-- **Transparent Operation**: Devices do not typically communicate to the switch itself; the switch only enables communication between devices
+- Switches forward traffic only within a broadcast domain
+- They do not route between IP subnets
+- Multilayer switches add Layer 3 capabilities but still include Layer 2 switching
 
-#### Limitations
+## Routers
 
-- **Local Network Only**: The role is not to provide connectivity between LANs or external networks
-- **Layer 2 Operation**: Works with MAC addresses within a single broadcast domain
+Routers operate at Layer 3 (network layer) and connect different networks.
 
-### Routers
+### Router functions
 
-Routers operate at Layer 3 (Network Layer) of the OSI model and provide connectivity between different networks.
+- Route packets between IP subnets
+- Connect LANs to WANs and the internet
+- Use a routing table to choose the next hop
+- Act as default gateways for end hosts
 
-#### Router Functions
+A router receives packets from one interface, looks up the destination network, and forwards them out another interface.
 
-- **Internet Connectivity**: Connects devices to the internet
-- **Inter-Network Communication**: Allows connectivity between LANs or external networks
-- **Network Edge**: Sits at the edge of networks and enables external communication
-- **Routing Decisions**: Makes intelligent decisions about the best path for data to travel
+### Where routers are used
 
-#### Usage Context
+- At the edge of a campus or branch site
+- Between office networks and service provider networks
+- In SOHO environments, combined with switch and wireless access point roles
 
-- **Not for LAN Connectivity**: They are not used to connect devices within a single LAN
-- **Gateway Function**: Acts as a gateway between different network segments
+## Wireless routers and access points
 
-#### Wireless Routers
+### Wireless routers
 
-A wireless router typically fulfills the purpose of multiple devices in one unit:
+A typical home or small office wireless router includes several functions in one device:
 
-- **Router**: Inter-network connectivity
-- **Switch**: Local device connectivity
-- **Wireless Access Point**: Wi-Fi connectivity
-- **Firewall**: Basic network security
+- Router between LAN and internet
+- Small Ethernet switch
+- Wireless access point
+- Basic firewall features
 
-### Firewalls
+This single device often provides all routing, switching, and Wi‑Fi for a SOHO network.
 
-A firewall helps protect networks by denying certain types of traffic based on predefined security rules.
+### Wireless access points
 
-#### Host-Based Firewalls
+- Provide Wi‑Fi connectivity for wireless clients
+- Bridge wireless traffic into a wired LAN
+- Often connect to access layer switches in campus designs
 
-- **Software Implementation**: Software firewalls are called host-based firewalls
-- **Device-Level Protection**: Examines traffic on the host device
-- **Rule-Based Decisions**: Decides to allow or block traffic based on a set of rules
-- **Individual Protection**: Protects the specific device on which it's installed
+## Firewalls
 
-#### Network Firewalls
+Firewalls enforce security policy by inspecting traffic and allowing or blocking it based on rules.
 
-- **Hardware Implementation**: A network firewall is a separate hardware appliance
-- **Network-Level Protection**: Similar to a host-based firewall but on a larger scale
-- **Traffic Inspection**: Inspects all traffic entering or leaving the entire network
-- **Centralized Security**: Provides security for the entire network infrastructure
+### Host based firewalls
 
-## Real-World Applications
+- Software on an individual host
+- Protects only the device where it runs
+- Examines traffic entering or leaving that host
+- Examples: built in OS firewalls
 
-### Small Office/Home Office (SOHO)
+### Network firewalls
 
-- **All-in-One Devices**: Wireless routers combining multiple functions
-- **Simple Network**: Direct internet connection through ISP-provided equipment
-- **Basic Security**: Built-in firewall protection
+- Dedicated device placed at the edge or between network segments
+- Inspects traffic passing through the firewall
+- Enforces policies for many hosts at once
+- Often combines stateful inspection, NAT, VPN, and other features
 
-### Enterprise Networks
+## Quick review
 
-- **Dedicated Devices**: Separate switches, routers, and firewalls for scalability
-- **Network Segmentation**: Multiple VLANs and subnets for security and organization
-- **Redundancy**: Multiple devices for high availability
-
-### Data Centers
-
-- **High-Performance Equipment**: Enterprise-grade switches and routers
-- **Advanced Security**: Multiple layers of firewall protection
-- **Network Virtualization**: Software-defined networking (SDN) implementation
-
-## Summary
-
-Understanding network devices is fundamental to CCNA certification and network administration:
-
-- **Computer Networks**: Enable resource sharing between connected nodes
-- **Client-Server Model**: Defines relationships rather than specific hardware types
-- **Switches**: Provide local connectivity within LANs at Layer 2
-- **Routers**: Enable inter-network communication and internet connectivity at Layer 3
-- **Firewalls**: Protect networks through traffic filtering and access control
-
-These devices work together to create functional, secure, and scalable network infrastructures that support modern business operations and personal connectivity needs.
+- Networks connect nodes so they can share resources.  
+- Clients request services; servers provide them. The same device can be both.  
+- Switches operate at Layer 2 and forward frames within a LAN based on MAC addresses.  
+- Routers operate at Layer 3 and forward packets between networks using IP addresses and routing tables.  
+- Wireless routers in SOHO networks combine router, switch, access point, and basic firewall functions.  
+- Firewalls, host based or network based, enforce security policy by filtering traffic.

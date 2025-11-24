@@ -2,84 +2,109 @@
 
 ## Overview
 
-Layer 2 discovery protocols enable network devices to share information about themselves with their directly connected neighbors. This information helps network engineers map out networks, identify devices, understand network topology, and troubleshoot connectivity issues. The two main Layer 2 discovery protocols are Cisco Discovery Protocol (CDP), which is Cisco-proprietary, and Link Layer Discovery Protocol (LLDP), which is an industry-standard protocol. Both protocols serve similar purposes but differ in their implementation and vendor support.
+Layer 2 discovery protocols let directly connected devices share basic information about themselves. This helps with topology mapping, documentation, and troubleshooting. Two protocols matter for CCNA:
+
+- Cisco Discovery Protocol (CDP): Cisco proprietary
+- Link Layer Discovery Protocol (LLDP): IEEE standard (802.1AB)
+
+Both advertise information such as hostname, interface, capabilities, and software version to neighbors on the same link.
 
 ## Cisco Discovery Protocol (CDP)
 
-### CDP Fundamentals
+### CDP basics
 
-- Cisco-proprietary Layer 2 discovery protocol
-- Runs on Cisco network devices such as routers and switches
-- Enabled by default on Cisco devices
-- Devices periodically send CDP advertisement messages out of their interfaces
-- Devices listen for CDP advertisements from neighboring devices
-- Shares information including hostname, capabilities, port ID, IP address, software version, and more
+- Cisco proprietary Layer 2 discovery protocol
+- Runs on Cisco routers, switches, and many other Cisco devices
+- Enabled by default on most Cisco platforms
+- Sends periodic advertisement messages out each CDP-enabled interface
+- Listens for CDP advertisements from neighbors
+- Typical advertised information:
+  - Device ID (hostname)
+  - Port ID (neighbor interface)
+  - Local interface
+  - Platform and capabilities
+  - Software version
+  - Management IP address
 
-### CDP Message Transmission
+CDP frames use multicast MAC address `0100.0ccc.cccc`. They are processed locally and not forwarded beyond directly connected neighbors.
 
-- CDP messages sent to multicast MAC address 0100.0ccc.cccc
-- Switches do not flood CDP messages like regular multicast frames
-- Switch receives CDP frame for itself and processes it
-- CDP messages are not forwarded beyond directly connected neighbors
+### CDP neighbor table
 
-### CDP Neighbor Table
+Each device maintains a CDP neighbor table:
 
-- Device maintains table of CDP neighbors
-- Neighbors are devices from which CDP messages have been received
-- Information stored includes device ID, local interface, port ID, capabilities, platform, and holdtime
+- Populated from received CDP advertisements
+- Stores:
+  - Device ID
+  - Local interface
+  - Port ID (neighbor interface)
+  - Capabilities
+  - Platform
+  - Holdtime
 
-### CDP Timers
+Entries remain until the holdtime expires or new advertisements refresh them.
 
-- **Advertisement timer**: How often device sends CDP messages
+### CDP timers
+
+Two main timers control CDP behavior:
+
+- Advertisement timer
+  - How often CDP sends messages
   - Default: 60 seconds
-  - Configure with: `cdp timer seconds`
-- **Holdtime**: How long neighbor keeps device in neighbor table after ceasing to receive CDP messages
+  - Command: `cdp timer seconds`
+- Holdtime
+  - How long a neighbor keeps the entry after advertisements stop
   - Default: 180 seconds
-  - Configure with: `cdp holdtime seconds`
-  - Each time device receives CDP advertisement, holdtime resets to 180 seconds
-  - If holdtime counts down to 0, neighbor removes device from table
+  - Command: `cdp holdtime seconds`
 
-### CDP Versions
+Each new advertisement resets the holdtime for that neighbor.
 
-- Two versions: CDPv1 and CDPv2
-- Modern Cisco devices send CDPv2 advertisements by default
-- Use `no cdp advertise-v2` to enable CDPv1 (for compatibility with very old devices)
-- Differences between versions are outside CCNA exam scope
+### CDP configuration
 
-### CDP Configuration
+CDP can be controlled globally and per interface.
 
-#### Global Configuration
+Global:
 
-- Enable CDP globally: `cdp run` (enabled by default)
-- Disable CDP globally: `no cdp run`
-- Configure advertisement timer: `cdp timer seconds`
-- Configure holdtime: `cdp holdtime seconds`
-- Enable/disable CDPv2: `[no] cdp advertise-v2`
+- Enable: `cdp run` (default)
+- Disable: `no cdp run`
+- Set advertisement timer: `cdp timer seconds`
+- Set holdtime: `cdp holdtime seconds`
+- CDP version:
+  - Default is CDPv2
+  - Disable v2 advertisements (use v1 only): `no cdp advertise-v2`
 
-#### Interface Configuration
+Interface:
 
-- Enable CDP on interface: `cdp enable` (enabled by default)
-- Disable CDP on interface: `no cdp enable`
-- Disabling on interface prevents both sending and receiving CDP messages
+- Enable on interface: `cdp enable` (default)
+- Disable on interface: `no cdp enable`
 
-### CDP Verification Commands
+Disabling on an interface stops both sending and receiving CDP messages on that interface.
 
-- `show cdp neighbors`: Lists CDP neighbors and basic information
-  - Shows Device ID, Local Interface, Holdtime, Capability, Platform, Port ID
-  - Local Interface: Interface on local device where neighbor is connected
-  - Port ID: Interface on neighbor device where local device is connected
-- `show cdp neighbors detail`: Shows detailed information about all CDP neighbors
-  - Includes hostname, platform, capabilities, IP address, software version, native VLAN, duplex, and more
-- `show cdp entry name`: Shows same information as `show cdp neighbors detail` for specified neighbor only
-- `show cdp`: Shows basic CDP information (status, timers, version)
-- `show cdp interface [interface]`: Shows CDP status and information for specific interface or all interfaces
-- `show cdp traffic`: Shows statistics about CDP messages sent and received
+### CDP verification
 
-### CDP Capability Codes
+Common commands:
+
+- `show cdp neighbors`
+  - Lists neighbors and basic data
+  - Columns: Device ID, Local Interface, Holdtime, Capability, Platform, Port ID
+- `show cdp neighbors detail`
+  - Detailed view of all neighbors
+  - Includes hostname, platform, capabilities, IP address, software version, native VLAN, duplex
+- `show cdp entry NAME`
+  - Detailed view of a single neighbor
+- `show cdp`
+  - Shows CDP status, version, and timers
+- `show cdp interface [interface]`
+  - CDP status per interface
+- `show cdp traffic`
+  - Counters for CDP packets sent and received
+
+### CDP capability codes
+
+Codes shown in the Capability column of `show cdp neighbors`:
 
 - R: Router
-- T: Trans Bridge
-- B: Source Route Bridge
+- T: Transparent bridge
+- B: Source route bridge
 - S: Switch
 - H: Host
 - I: IGMP
@@ -87,167 +112,178 @@ Layer 2 discovery protocols enable network devices to share information about th
 - P: Phone
 - D: Remote
 - C: CVTA
-- M: Two-port Mac Relay
+- M: Two-port MAC relay
 
-### CDP Security Considerations
+Memorizing all codes is less important than recognizing routers, switches, and phones.
 
-- CDP shares significant information about device
-- Information includes software version, which could be used to identify vulnerabilities
-- Malicious users could exploit CDP information for targeted attacks
-- Consider disabling CDP globally or on specific interfaces where not necessary
-- Balance security needs with operational requirements
+### CDP security and usage
 
-### Network Mapping with CDP
+CDP exposes information that can help attackers:
 
-- Use CDP to map network topology when documentation is incomplete
-- Run `show cdp neighbors` on multiple devices
-- Use Local Interface and Port ID columns to determine connections
-- Build network diagram from CDP neighbor information
-- Useful when physical access to devices is not available
+- Hostname and platform
+- Software version
+- IP addressing and VLAN details
+
+Typical practices:
+
+- Disable CDP on interfaces facing untrusted networks:
+  - `interface G0/0`
+  - `no cdp enable`
+- Consider disabling globally in very sensitive environments
+- Leave enabled on internal links where topology discovery and troubleshooting are important
+
+CDP is very useful for:
+
+- Building or validating network diagrams
+- Identifying what is connected to each interface
+- Checking neighbor software versions and platforms
 
 ## Link Layer Discovery Protocol (LLDP)
 
-### LLDP Fundamentals
+### LLDP basics
 
-- Industry-standard Layer 2 discovery protocol
+- Vendor-neutral Layer 2 discovery protocol
 - Defined in IEEE 802.1AB
-- Vendor-neutral protocol that can be implemented by any vendor
-- Cisco routers and switches support both CDP and LLDP
-- Serves similar purpose to CDP but as industry standard
-- Not enabled by default on Cisco devices
+- Supported by many vendors, including Cisco
+- Similar purpose to CDP but standardized
 
-### LLDP Message Transmission
+Cisco devices support both CDP and LLDP at the same time. LLDP is disabled by default on Cisco IOS.
 
-- LLDP messages sent to multicast MAC address 0180.c200.000e
-- Switches do not flood LLDP messages
-- Switch receives LLDP frame for itself and processes it
-- LLDP messages are not forwarded beyond directly connected neighbors
+LLDP frames use multicast MAC address `0180.c200.000e`. Like CDP, LLDP messages stay on the local link and are not forwarded further.
 
-### LLDP Configuration
+### LLDP timers
 
-#### Global Configuration
+LLDP uses similar timers to CDP:
 
-- Enable LLDP globally: `lldp run`
-- Disable LLDP globally: `no lldp run`
-- Configure advertisement timer: `lldp timer seconds` (default: 30 seconds)
-- Configure holdtime: `lldp holdtime seconds` (default: 120 seconds)
-- Configure reinitialization delay: `lldp reinit seconds` (default: 2 seconds)
-
-#### Interface Configuration
-
-- Enable LLDP transmission: `lldp transmit` (enabled by default when LLDP is globally enabled)
-- Disable LLDP transmission: `no lldp transmit`
-- Enable LLDP reception: `lldp receive` (enabled by default when LLDP is globally enabled)
-- Disable LLDP reception: `no lldp receive`
-- Can control transmission and reception separately
-- Allows device to send but not receive, or receive but not send
-
-### LLDP Timers
-
-- **Advertisement timer**: How often device sends LLDP messages
-  - Default: 30 seconds (half of CDP's default)
-  - Configure with: `lldp timer seconds`
-- **Holdtime**: How long neighbor keeps device in neighbor table after ceasing to receive LLDP messages
-  - Default: 120 seconds (shorter than CDP's default)
-  - Configure with: `lldp holdtime seconds`
-- **Reinitialization delay**: How long interface waits before sending LLDP messages after LLDP is activated
+- Advertisement timer
+  - How often LLDP messages are sent
+  - Default: 30 seconds
+  - Command: `lldp timer seconds`
+- Holdtime
+  - How long a neighbor keeps the entry after advertisements stop
+  - Default: 120 seconds
+  - Command: `lldp holdtime seconds`
+- Reinitialization delay
+  - Delay before LLDP starts sending messages after being enabled
   - Default: 2 seconds
-  - Configure with: `lldp reinit seconds`
-  - Beneficial when interface is bouncing between up and down states
-  - Provides time for port to stabilize before sending LLDP messages
+  - Command: `lldp reinit seconds`
 
-### LLDP Verification Commands
+The shorter default advertisement and holdtime values make LLDP react a bit faster than CDP by default.
 
-- `show lldp neighbors`: Lists LLDP neighbors and basic information
-  - Shows Device ID, Local Interface, Hold-time, Capability, Port ID
-  - Similar format to `show cdp neighbors`
-- `show lldp neighbors detail`: Shows detailed information about all LLDP neighbors
-  - Includes system name, system description, chassis ID, port ID, capabilities, management addresses, and more
-- `show lldp entry name`: Shows same information as `show lldp neighbors detail` for specified neighbor only
-- `show lldp`: Shows basic LLDP information (status, timers)
-- `show lldp interface [interface]`: Shows LLDP status for specific interface or all interfaces
-  - Shows Tx (transmission) and Rx (reception) status
-  - Shows Tx state and Rx state
-- `show lldp traffic`: Shows statistics about LLDP messages sent and received
+### LLDP configuration
 
-### LLDP Capability Codes
+Global:
+
+- Enable LLDP: `lldp run`
+- Disable LLDP: `no lldp run`
+- Adjust timers with:
+  - `lldp timer seconds`
+  - `lldp holdtime seconds`
+  - `lldp reinit seconds`
+
+Interface:
+
+- Enable transmit: `lldp transmit`
+- Enable receive: `lldp receive`
+- Disable transmit: `no lldp transmit`
+- Disable receive: `no lldp receive`
+
+Transmit and receive can be controlled independently per interface. For example, an interface can send LLDP but not accept LLDP from the neighbor.
+
+### LLDP verification
+
+Common commands:
+
+- `show lldp neighbors`
+  - Neighbor summary
+  - Similar layout to `show cdp neighbors`
+- `show lldp neighbors detail`
+  - Detailed view of all LLDP neighbors
+  - Includes system name, description, chassis ID, port ID, capabilities, management addresses
+- `show lldp entry NAME`
+  - Detailed view of a single neighbor
+- `show lldp`
+  - Global LLDP status and timers
+- `show lldp interface [interface]`
+  - LLDP status per interface, including transmit and receive state
+- `show lldp traffic`
+  - Counters for LLDP packets sent and received
+
+### LLDP capability codes
+
+Common capability codes:
 
 - R: Router
-- B: Bridge (equivalent to CDP's S for Switch)
+- B: Bridge (switch)
 - T: Telephone
-- C: DOCSIS Cable Device
-- W: WLAN Access Point
+- C: DOCSIS cable device
+- W: WLAN access point
 - P: Repeater
 - S: Station
 - O: Other
 
-### CDP vs LLDP
+As with CDP, knowing router, switch, and phone codes is usually enough for CCNA.
 
-- **CDP**: Cisco-proprietary, enabled by default, works only with Cisco devices
-- **LLDP**: Industry-standard, disabled by default, works with any vendor's devices
-- Both can run simultaneously on same device (redundant but possible)
-- Choose CDP if network uses only Cisco devices
-- Choose LLDP if network uses mix of vendors
-- Commands are very similar; mostly replace `cdp` with `lldp`
+## CDP and LLDP comparison
 
-## Real-World Applications
+Key differences:
 
-- **Network documentation**: Map out network topology when documentation is incomplete
-- **Troubleshooting**: Identify connected devices and interfaces quickly
-- **Device discovery**: Find all Cisco devices in network
-- **Interface identification**: Determine which interfaces connect to which devices
-- **Software version tracking**: Identify devices running specific software versions
-- **Network inventory**: Build inventory of network devices and their capabilities
-- **Multi-vendor networks**: Use LLDP in networks with mixed vendor equipment
-- **Remote network mapping**: Map network when physical access is not available
+- CDP
+  - Cisco proprietary
+  - Enabled by default
+  - Works only between Cisco devices
+- LLDP
+  - IEEE 802.1AB standard
+  - Disabled by default on Cisco devices
+  - Works across vendors
 
-## Troubleshooting
+Both protocols can run on the same interface at the same time. In a Cisco-only network, CDP alone is often enough. In multi-vendor networks, LLDP is the standard choice.
 
-### Common Issues
+Commands are similar. Often, `cdp` in a command is replaced with `lldp` for the equivalent LLDP command.
 
-- **No neighbors showing**: Verify protocol is enabled globally and on interface
-- **Neighbor disappeared**: Check holdtime; neighbor may have stopped sending advertisements
-- **Wrong information displayed**: Verify both devices have protocol enabled
-- **Security concerns**: Consider disabling on interfaces connected to untrusted networks
+## Operational use cases
 
-### Troubleshooting Steps
+Typical uses for CDP and LLDP:
 
-1. Verify protocol is enabled: `show cdp` or `show lldp`
-2. Check interface status: `show cdp interface` or `show lldp interface`
-3. Verify neighbor is sending messages: `show cdp traffic` or `show lldp traffic`
-4. Check timers: Verify advertisement timer and holdtime are appropriate
-5. Verify interface is up: Check interface status with `show ip interface brief`
+- Topology discovery and documentation
+- Verifying which device connects to which interface
+- Validating uplinks during changes and migrations
+- Locating devices by hostname or IP
+- Building an inventory of device types and software versions
 
-## Best Practices
+In production networks:
 
-- Use CDP in Cisco-only networks
-- Use LLDP in multi-vendor networks
-- Disable discovery protocols on interfaces connected to untrusted networks for security
-- Document network topology using discovery protocol information
-- Regularly review neighbor tables to detect unauthorized devices
-- Use discovery protocols to verify network changes
-- Balance security needs with operational benefits
-- Consider disabling globally if security is primary concern
-- Use discovery protocols for network inventory and documentation
+- Enable on internal links where discovery is helpful
+- Disable on interfaces facing the internet, guest networks, or other untrusted segments
+- Use neighbor output as a quick cross-check against formal documentation
 
-## Summary
+## Troubleshooting checklist
 
-- Layer 2 discovery protocols enable devices to share information with directly connected neighbors
-- CDP is Cisco-proprietary and enabled by default; LLDP is industry-standard and disabled by default
-- CDP messages sent to multicast MAC 0100.0ccc.cccc; LLDP messages sent to 0180.c200.000e
-- CDP default timers: 60 seconds advertisement, 180 seconds holdtime
-- LLDP default timers: 30 seconds advertisement, 120 seconds holdtime, 2 seconds reinitialization delay
-- Enable CDP globally with `cdp run`; enable LLDP globally with `lldp run`
-- Configure timers with `cdp timer`, `cdp holdtime`, `lldp timer`, `lldp holdtime`, `lldp reinit`
-- Disable on interfaces with `no cdp enable` or `no lldp transmit`/`no lldp receive`
-- Use `show cdp neighbors` and `show lldp neighbors` to view neighbor information
-- Use `show cdp neighbors detail` and `show lldp neighbors detail` for detailed information
-- Use `show cdp entry name` and `show lldp entry name` for specific neighbor information
-- Use `show cdp` and `show lldp` to view protocol status and timers
-- Use `show cdp interface` and `show lldp interface` to view interface status
-- Use `show cdp traffic` and `show lldp traffic` to view message statistics
-- Local Interface column shows interface on local device; Port ID shows interface on neighbor
-- CDP and LLDP share similar information: hostname, capabilities, platform, IP address, software version
-- Choose CDP for Cisco-only networks; choose LLDP for multi-vendor networks
-- Consider security implications of sharing device information via discovery protocols
+When neighbors do not show up as expected:
 
+1. Confirm the protocol is globally enabled:
+   - `show cdp` or `show lldp`
+2. Check that the interface is up and in the correct VLAN:
+   - `show ip interface brief`
+3. Verify protocol status on the interface:
+   - `show cdp interface` or `show lldp interface`
+4. Look at traffic counters:
+   - `show cdp traffic` or `show lldp traffic`
+5. Check timers if entries appear and then disappear:
+   - Holdtime may be expiring without new advertisements
+
+If only one side sees the neighbor, check transmit and receive settings on both ends.
+
+## Quick review
+
+- CDP and LLDP are Layer 2 discovery protocols that advertise device information to directly connected neighbors.
+- CDP is Cisco proprietary and enabled by default; LLDP is an IEEE standard and disabled by default on Cisco IOS.
+- CDP uses multicast MAC `0100.0ccc.cccc` with default timers of 60 seconds (advertisement) and 180 seconds (holdtime).
+- LLDP uses multicast MAC `0180.c200.000e` with default timers of 30 seconds (advertisement), 120 seconds (holdtime), and 2 seconds (reinit).
+- Global enable commands:
+  - CDP: `cdp run`
+  - LLDP: `lldp run`
+- Key verification commands:
+  - `show cdp neighbors` and `show cdp neighbors detail`
+  - `show lldp neighbors` and `show lldp neighbors detail`
+- Disable discovery where information leakage is a concern, especially on interfaces facing untrusted networks.

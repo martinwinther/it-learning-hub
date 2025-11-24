@@ -2,277 +2,218 @@
 
 ## Overview
 
-First hop redundancy protocols (FHRPs) allow multiple routers to work together to provide a redundant default gateway for hosts in a LAN, minimizing downtime in the event of hardware failures. The default gateway is the first hop in a packet's path to its destination, hence the name. FHRPs eliminate single points of failure for default gateway connectivity, ensuring network reliability and resilience.
+First Hop Redundancy Protocols (FHRPs) provide a redundant default gateway for hosts in a LAN. Multiple routers share a virtual default gateway, so if one router fails, another can take over without requiring changes on the hosts.
 
-## The Problem FHRPs Solve
+## Problem FHRPs solve
 
-### Default Gateway Dependency
+### Default gateway as single point of failure
 
-- End hosts rely on default gateway to reach external destinations
-- Default gateway is either manually configured or learned via DHCP
-- Hosts use ARP to learn MAC address of default gateway
-- If default gateway fails, hosts lose connectivity to external networks
+- Hosts send traffic for remote networks to a default gateway
+- Default gateway IP is configured manually or learned via DHCP
+- Hosts ARP for the gateway IP and cache its MAC address
+- If the gateway router or its interface fails, hosts lose connectivity to external networks
 
-### Redundancy Without FHRP
+### Basic redundancy without FHRP
 
-- Multiple routers may exist but cannot coordinate without FHRP
-- Hosts continue using failed router's IP address as default gateway
-- Manual reconfiguration of each host is not acceptable in modern networks
-- Network must recover automatically with minimal downtime
+- Multiple routers can exist on the subnet
+- Hosts still point at a single gateway IP
+- Moving hosts to another router requires manual changes or new DHCP leases
+- This is slow and error prone
 
-### FHRP Solution
+FHRPs provide a virtual gateway that can move between routers automatically.
 
-- Multiple routers share a virtual IP (VIP) address
-- VIP is configured as default gateway for hosts in the LAN
-- Routers coordinate to provide redundant default gateway
-- Failover is transparent to end hosts
+## FHRP operation
 
-## How FHRPs Work
+### Virtual IP address
 
-### Virtual IP Address (VIP)
+- FHRP group shares a virtual IP (VIP)
+- VIP is used as default gateway for hosts in the VLAN
+- All routers in the group know the VIP
+- Only the active router forwards traffic for the VIP
 
-- Shared IP address used by multiple routers in an FHRP group
-- Configured as default gateway for hosts in the LAN
-- Only one router (active) responds to ARP requests for VIP at a time
-- If active router fails, standby router takes over and responds to ARP requests
+### Virtual MAC address
 
-### Virtual MAC Address
+- Group also shares a virtual MAC address
+- Active router responds to ARP for the VIP using the virtual MAC
+- Hosts build an ARP entry mapping VIP to the virtual MAC
+- Switches learn the virtual MAC on the port toward the active router
 
-- Shared MAC address used by routers in FHRP group
-- Active router replies to ARP requests with virtual MAC address (not its own interface MAC)
-- Hosts create ARP table entry mapping VIP to virtual MAC
-- Switches learn virtual MAC address on port leading toward active router
+### Hello messages and roles
 
-### FHRP Groups
+- Routers in a group send periodic hello messages
+- Hello messages use a multicast group address
+- Roles:
+  - Active or master router forwards packets for the VIP
+  - Standby or backup router is ready to take over
+- If hello messages from the active router stop, another router takes over
 
-- Set of routers configured to use an FHRP is called a group
-- Single router can be part of multiple FHRP groups
-- Each subnet can have its own FHRP group and VIP
-- Useful when LAN has multiple subnets
+Terminology differs by protocol (HSRP uses active and standby, VRRP uses master and backup).
 
-### Hello Messages
+### Failover and gratuitous ARP
 
-- Routers communicate via multicast hello messages
-- Sent at regular intervals
-- Used for establishing and maintaining FHRP neighbor relationships
-- If router stops receiving hellos from neighbor, assumes neighbor has failed
-- Similar mechanism to OSPF neighbor relationships
-
-### Active and Standby Routers
-
-- **Active router**: Serves as default gateway, responds to ARP requests for VIP
-- **Standby router**: Ready to take over if active router fails
-- Note: Terminology varies by FHRP (HSRP uses active/standby, VRRP uses master/backup)
-
-### Failover Process
-
-- When active router fails, standby router takes over active role
-- Process is called failover
-- New active router sends gratuitous ARP (GARP) messages
-- GARP messages update switches' MAC address tables
-- End hosts are unaware of failover (VIP and virtual MAC remain same)
-
-### Gratuitous ARP (GARP)
-
-- ARP replies that were not prompted by ARP requests
-- Sent to broadcast MAC address (ffff.ffff.ffff)
-- Source MAC address is virtual MAC address
-- Causes switches to flood messages and update MAC address tables
-- Allows switches to learn virtual MAC on port leading toward new active router
+- When the active router fails, a standby or backup takes over the role
+- New active router starts forwarding for the VIP
+- New active sends gratuitous ARP (GARP) frames
+  - Uses VIP and virtual MAC
+  - Updates switch MAC tables so the virtual MAC now points to the new port
+- Hosts keep using the same VIP and virtual MAC
 
 ### Preemption
 
-- Feature that allows higher-priority router to take over active role
-- Even if another router is currently active
-- Behavior varies by FHRP (enabled by default in VRRP, disabled in HSRP)
-- Same term used in OSPF DR/BDR elections
+- Preemption allows a higher priority router to take over the active role
+- Useful when one router is preferred as the active gateway
+- Default behavior varies:
+  - HSRP: preemption disabled by default
+  - VRRP: preemption enabled by default
+  - GLBP: AVG preemption disabled by default, AVF preemption enabled by default
 
-## FHRP Types
+## FHRP types
 
-Cisco routers support three different FHRPs:
+Cisco platforms commonly support three FHRPs.
 
 ### Hot Standby Router Protocol (HSRP)
 
-- Cisco-proprietary FHRP
-- Only runs on Cisco routers
-- Uses active/standby terminology
+- Cisco proprietary
+- Uses active and standby roles
 - Preemption disabled by default
 - Two versions: HSRPv1 and HSRPv2
 
-#### HSRP Versions
+#### HSRPv1
 
-**HSRPv1:**
-- Hello messages sent to multicast IP 224.0.0.2 (all routers)
-- Virtual MAC format: 0000.0c07.acXX (XX is group number)
-- Supports 256 groups (0-255)
+- Multicast address: 224.0.0.2 (all routers)
+- Virtual MAC: `0000.0c07.acXX` (XX is group number)
+- Group numbers: 0 to 255
 - IPv4 only
 
-**HSRPv2:**
-- Hello messages sent to multicast IP 224.0.0.102 (reserved for HSRPv2 and GLBP)
-- Virtual MAC format: 0000.0c9f.fXXX (XXX is group number)
-- Supports 4,096 groups (0-4,095)
-- Supports IPv6 (in addition to IPv4)
+#### HSRPv2
 
-#### HSRP Load Balancing
+- Multicast address: 224.0.0.102
+- Virtual MAC: `0000.0c9f.fXXX` (XXX is group number)
+- Group numbers: 0 to 4095
+- Supports IPv4 and IPv6
 
-- Load balancing achieved per subnet
-- Configure one router as active in some subnets, standby in others
-- Other router configured opposite
-- Avoids congestion on single link
+Load balancing with HSRP:
+
+- Achieved per subnet
+- One router can be active for some VLANs and standby for others
+- Another router can use the opposite pattern
 
 ### Virtual Router Redundancy Protocol (VRRP)
 
-- Industry-standard FHRP (IETF standard)
-- Can be implemented on any vendor's routers
-- Uses master/backup terminology (instead of active/standby)
+- Open standard (IETF)
+- Master and backup roles
 - Preemption enabled by default
-- Multicast IP: 224.0.0.18 (reserved for VRRP)
-- Virtual MAC format: 0000.5e00.01XX (XX is group number)
-- Supports per-subnet load balancing (like HSRP)
+- Multicast address: 224.0.0.18
+- Virtual MAC: `0000.5e00.01XX` (XX is group number)
+- Load balancing done per subnet by using different masters in different VLANs
+
+VRRP is preferred in multi vendor environments.
 
 ### Gateway Load Balancing Protocol (GLBP)
 
-- Cisco-proprietary FHRP
-- Unique feature: enables load balancing within single subnet
-- Load balancing done on per-host basis
-- Elects Active Virtual Gateway (AVG)
-- AVG assigns up to four Active Virtual Forwarders (AVFs)
-- AVG itself can be an AVF
-- Multicast IP: 224.0.0.102 (same as HSRPv2)
-- Virtual MAC format: 0007.b400.XXYY (XX is group number, YY is AVF number)
-- AVG preemption disabled by default; AVF preemption enabled by default
+- Cisco proprietary
+- Provides redundancy and per host load balancing
+- Roles:
+  - Active Virtual Gateway (AVG)
+  - Active Virtual Forwarders (AVFs)
+- AVG assigns up to four AVFs
+- AVG can also act as an AVF
 
-#### GLBP Load Balancing
+GLBP addressing:
 
-- Single VIP but multiple virtual MAC addresses (one per AVF)
-- AVG replies to ARP requests with virtual MAC of AVFs in round-robin manner
-- Half of hosts use one AVF, other half use another AVF
-- Achieves load balancing within single subnet
+- Multicast address: 224.0.0.102
+- Virtual MAC: `0007.b400.XXYY` (XX is group number, YY is AVF number)
 
-## FHRP Comparison
+GLBP load balancing:
 
-| Characteristic | HSRP | VRRP | GLBP |
-|----------------|------|------|------|
-| Terminology | Active/Standby | Master/Backup | AVG/AVF |
-| Multicast IP (v2) | 224.0.0.102 | 224.0.0.18 | 224.0.0.102 |
-| Virtual MAC Format (v2) | 0000.0c9f.fXXX | 0000.5e00.01XX | 0007.b400.XXYY |
-| Cisco Proprietary? | Yes | No | Yes |
-| Load Balancing | Per subnet | Per subnet | Per host |
-| Preemption (default) | Disabled | Enabled | AVG: Disabled, AVF: Enabled |
+- Single VIP, multiple virtual MAC addresses
+- AVG replies to ARP requests with different virtual MACs
+- Hosts are spread across AVFs
+- Traffic is balanced within a single VLAN
 
-## HSRP Configuration
+## FHRP comparison
 
-### Basic Configuration
+| Characteristic       | HSRP                | VRRP                 | GLBP                            |
+|----------------------|---------------------|----------------------|----------------------------------|
+| Standard or vendor   | Cisco proprietary   | Open standard        | Cisco proprietary                |
+| Roles                | Active / Standby    | Master / Backup      | AVG / AVF                        |
+| Default preemption   | Disabled            | Enabled              | AVG: disabled, AVF: enabled      |
+| Load balancing       | Per subnet          | Per subnet           | Per host                         |
+| Multicast address v2 | 224.0.0.102         | 224.0.0.18           | 224.0.0.102                      |
+| Virtual MAC format   | `0000.0c9f.fXXX`    | `0000.5e00.01XX`     | `0007.b400.XXYY`                 |
 
-Each router in HSRP group needs:
+## Basic HSRP configuration
 
-1. Unique IP address on interface (for router-to-router communication)
-2. HSRP version configuration
-3. VIP configuration
-4. Optional: Priority and preemption configuration
+### Requirements
 
-### Configuration Commands
+Each router in the HSRP group needs:
+
+- Unique IP address on the interface
+- Same HSRP version
+- Same group number
+- Same VIP
+
+Hosts in the VLAN use the VIP as their default gateway.
+
+### Example configuration
 
 ```cisco
 interface GigabitEthernet0/0
  ip address 10.0.0.2 255.255.255.0
- standby version 2                    ! Enable HSRPv2
- standby 1 ip 10.0.0.1               ! Configure VIP for group 1
- standby 1 priority 105              ! Set priority (default 100)
- standby 1 preempt                   ! Enable preemption
+ standby version 2          ! Use HSRPv2
+ standby 1 ip 10.0.0.1      ! VIP for group 1
+ standby 1 priority 110     ! Higher priority than default 100
+ standby 1 preempt          ! Take over active role when up
  no shutdown
 ```
 
-### Active Router Selection
+Points to remember:
 
-HSRP active router is determined by:
+- Group number and VIP must match on routers in the same HSRP group
+- HSRPv1 and HSRPv2 are not interoperable in the same group
+- Priority is optional unless a specific active router is desired
+- Preemption is needed only on routers that should retake the active role
 
-1. Highest priority (default 100)
-2. Highest IP address (if priorities tied)
+### Active router selection
 
-### Configuration Notes
+Active router for a group is chosen by:
 
-- Group number and VIP must match on both routers
-- HSRPv1 and HSRPv2 are not compatible
-- Preemption only needs to be configured on router that should retake active role
-- Priority configuration only needed if you want specific router to be active
+1. Highest HSRP priority
+2. Highest IP address (if priorities tie)
 
-## Verification Commands
+## Verification and troubleshooting
 
-### HSRP Status
+### Verification commands
 
-- `show standby brief`: View brief HSRP status for all groups
-- `show standby`: View detailed HSRP information
+- `show standby brief`
+  - Group, VIP, local state, active and standby addresses
+- `show standby`
+  - Detailed HSRP information including timers and preemption
+- `show ip interface brief`
+  - Interface status and IP addressing
 
-### Command Output Interpretation
+### Troubleshooting notes
 
-- **State**: Active or Standby
-- **Active**: IP address of current active router (local if this router is active)
-- **Standby**: IP address of current standby router (local if this router is standby)
-- **Virtual IP**: The VIP address
-- **Priority**: Router's priority value
-- **P**: Indicates preemption is configured
+- Failover does not occur:
+  - Check hello and hold timers
+  - Confirm group number and VIP match on all routers
+- Both routers think they are active:
+  - Verify group configuration and version
+  - Look for mismatched subnets or VLANs
+- Hosts cannot reach external networks:
+  - Confirm hosts use the VIP as default gateway
+  - Check ARP tables for the VIP and virtual MAC
+- Preemption does not work as expected:
+  - Confirm `standby <group> preempt` is configured on the higher priority router
 
-## Real-World Applications
+## Quick review
 
-- **Enterprise LANs**: Provide redundant default gateway for critical network segments
-- **Data centers**: Ensure high availability for server connectivity
-- **Branch offices**: Redundant connectivity to headquarters
-- **Multi-vendor environments**: Use VRRP when mixing Cisco and non-Cisco routers
-- **High-availability requirements**: Minimize downtime for business-critical applications
-- **Load balancing**: Distribute traffic across multiple routers (HSRP/VRRP per subnet, GLBP per host)
-
-## Troubleshooting FHRPs
-
-### Common Issues
-
-- **Failover not occurring**: Check hello messages are being received, verify priority configuration
-- **Both routers think they're active**: Check group number and VIP match on both routers
-- **Hosts can't reach external networks**: Verify VIP is configured as default gateway on hosts
-- **Slow failover**: Check hello and hold timers
-- **Preemption not working**: Verify preemption is enabled on higher-priority router
-
-### Troubleshooting Steps
-
-1. Verify HSRP is configured on both routers: `show standby brief`
-2. Check that group number and VIP match
-3. Verify interface status: `show ip interface brief`
-4. Check hello messages: Verify routers can communicate
-5. Verify priority and preemption settings
-6. Test failover by shutting down active router interface
-
-## Best Practices
-
-- Use HSRPv2 for modern networks (supports IPv6 and more groups)
-- Configure preemption on routers that should be active when operational
-- Set appropriate priorities to ensure desired router becomes active
-- Use GLBP when load balancing within single subnet is needed
-- Use VRRP in multi-vendor environments
-- Configure consistent group numbers and VIPs across routers
-- Monitor HSRP status regularly
-- Document which router should be active for each group
-- Test failover scenarios in lab before production deployment
-
-## Summary
-
-- FHRPs allow multiple routers to provide redundant default gateway for hosts
-- Routers share virtual IP (VIP) and virtual MAC address
-- Active router serves as default gateway; standby router ready to take over
-- Routers communicate via multicast hello messages
-- Failover is transparent to end hosts (VIP and virtual MAC remain same)
-- New active router sends GARP messages to update switch MAC tables
-- Preemption allows higher-priority router to take over active role
-- Three FHRPs: HSRP (Cisco-proprietary), VRRP (industry-standard), GLBP (Cisco-proprietary)
-- HSRP uses active/standby terminology; preemption disabled by default
-- HSRPv1: multicast 224.0.0.2, MAC 0000.0c07.acXX, 256 groups, IPv4 only
-- HSRPv2: multicast 224.0.0.102, MAC 0000.0c9f.fXXX, 4,096 groups, IPv4 and IPv6
-- VRRP uses master/backup terminology; preemption enabled by default
-- VRRP: multicast 224.0.0.18, MAC 0000.5e00.01XX, industry-standard
-- GLBP enables per-host load balancing within single subnet
-- GLBP: multicast 224.0.0.102, MAC 0007.b400.XXYY, AVG assigns AVFs
-- HSRP load balancing achieved per subnet by configuring different active routers
-- Each router needs unique IP address even when sharing VIP
-- Configure HSRP with: `standby version 2`, `standby group ip vip`, `standby group priority`, `standby group preempt`
-- Active router determined by highest priority, then highest IP address
-- Use `show standby brief` and `show standby` to verify HSRP operation
-
+- FHRPs provide a redundant default gateway by sharing a VIP and virtual MAC across routers.
+- Active or master router forwards traffic and responds to ARP for the VIP.
+- Standby or backup router monitors hello messages and takes over on failure, sending gratuitous ARP.
+- HSRP and GLBP are Cisco proprietary, VRRP is an open standard.
+- HSRP and VRRP provide per subnet load balancing by varying which router is active per VLAN.
+- GLBP provides per host load balancing within a single subnet by using multiple virtual MAC addresses.
+- HSRP version 2 supports more groups and IPv6 and uses multicast 224.0.0.102.
+- Basic HSRP config uses `standby version`, `standby <group> ip`, `standby <group> priority`, and `standby <group> preempt`.
+- `show standby brief` and `show standby` are primary verification commands.

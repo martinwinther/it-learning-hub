@@ -2,342 +2,221 @@
 
 ## Overview
 
-We have delved into the details of protocols like IPv4 and IPv6, Ethernet, Spanning Tree Protocol, and many others in previous chapters. Now it's time to zoom out. Instead of focusing on individual technologies, let's take a holistic view of real-world network architectures—the blueprints for how computer networks are designed and built. Although there are standard best practices in network design, many factors such as budget, scale, and specific needs influence the "right" approach; there are few universal correct answers to questions of network design. In the beginning stages of your networking career, you probably won't be designing networks. However, to configure and troubleshoot networks, understanding the architectural principles behind them is essential.
+LAN architectures describe how switches, routers, and hosts are arranged and interconnected. The same basic patterns appear in campus networks, data centers, and small office or home office (SOHO) environments. CCNA focuses on recognizing these patterns and understanding what each layer or device is responsible for.
 
-## Network Topologies
+## Network topologies
 
-### Topology Definition
+### Star topology
 
-- Topology is how devices are arranged and connected together in network
-- Some common topologies consistently emerge across different networks
-- Common patterns of device connections
+- All devices connect to a single central device
+- Common in LANs: end hosts connected to one switch
+- Also called hub and spoke in WAN context
+- Central device is the hub, connected devices are spokes
 
-### Star Topology
+### Full mesh topology
 
-- In star topology, all devices connect to one central device
-- Most common example of star topology is group of end hosts connected to switch
-- Another name for star topology is hub-and-spoke topology
-- Central device is hub, and devices connecting to it are spokes
-- Star is more commonly used in LAN context
-- Hub-and-spoke in WAN context
+- Every device has a direct link to every other device
+- High reliability because there are many paths
+- Number of links can be calculated with N(N − 1) / 2
+- Often implemented as VPN tunnels over a provider network rather than physical links
+- Used for small groups of critical devices
 
-### Full Mesh Topology
+### Partial mesh topology
 
-- In full mesh, each device in topology is directly connected to each of other devices
-- Full-mesh topologies provide high reliability because there are multiple possible paths to each destination
-- If there is problem with one path, multiple other paths are available
-- Can calculate number of connections between devices in full mesh with formula N(N-1)/2, where N is number of devices
-- Example: with six devices, there are 15 links
-- Although they appear as direct connections, in reality, these would likely be secure virtual private network (VPN) connections over service provider's network
+- Some devices have multiple links, others only one
+- Not every device connects directly to every other device
+- Common pattern between access and distribution switches
 
-### Partial Mesh Topology
+### Hybrid topology
 
-- There is also partial mesh, in which certain devices, but not all, are directly connected to each other
-- You'll see this pattern between switches in access layer and distribution layer of campus LAN
+- Real networks mix star, mesh, and other patterns
+- Terms above describe repeated shapes in larger designs
 
-### Hybrid Topology
+## Campus LAN architecture
 
-- Most networks are combination of these common topologies and others—hybrid topology
-- These terms are all commonly used to describe how devices are connected in networks
-- Keep eye out for these recurring patterns as we examine different network architectures
+### Campus LAN definition
 
-## Campus LAN Architecture
+- Serves local users in one site or group of nearby buildings
+- Can be as small as one switch or as large as a multi building campus
+- Focus is on wired and wireless access for end users and local services
 
-### Campus LAN Definition
+### Three layer hierarchy
 
-- Campus LAN is network that is designed to serve networking needs of local users within certain area
-- Although term campus evokes idea of network spread across multiple buildings in close proximity, like university campus or office park
-- In this context, it doesn't imply any particular geographic size
-- Campus LAN could be small site with single switch or multibuilding campus stretching across office park
+Cisco campus designs use three logical layers:
 
-### Three-Layer Hierarchy
+- Access layer  
+  - Where end hosts connect
+  - Provides Layer 2 access and edge security
+- Distribution layer  
+  - Aggregates access switches
+  - Connects toward WAN and internet
+  - Often the Layer 2 and Layer 3 boundary
+- Core layer  
+  - Aggregates distribution blocks
+  - Focus on fast and reliable forwarding
 
-Cisco campus LANs use hierarchical design, dividing network into three modular layers:
+### Modular design
 
-- **Access layer**: Provides access to network for end hosts
-- **Distribution layer**: Aggregates connections from access layer and provides connectivity to WAN and internet
-- **Core layer**: Aggregates connections between distribution layers in large LANs
+- Each access plus distribution pair can be treated as a block
+- Additional blocks can be added as the site grows
+- Core layer ties blocks together in larger designs
 
-### Modular Design
+## Two tier campus LAN
 
-- Cisco campus LAN architecture is not one-size-fits-all
-- Depending on site, one, two, or all three layers might be present
-- Layers are modular, allowing for flexible scalability
-- These modular pieces are sometimes called blocks
-- As network expands, additional access and/or distribution blocks can be added as needed
+### Collapsed core overview
 
-## Two-Tier Campus LAN
+- Two tier design uses only access and distribution layers
+- Core and distribution roles are combined in distribution switches
+- Also called collapsed core design
+- Common in small and medium sites
 
-### Two-Tier Overview
+### Access layer characteristics
 
-- CCNA exam topics list states that you must be able to describe two- and three-tier campus LANs
-- We will start small, with two-tier campus LANs
-- This kind of design is also called collapsed core because core layer is absent
-- Only access and distribution layers are present
-- Another way to think of collapsed core is that core and distribution layers are combined into one
-- For this reason, second layer of two-tier LAN is sometimes called core-distribution layer
+Typical features at the access layer:
 
-### Access Layer
+- Host connectivity for PCs, phones, printers, cameras, and access points
+- Port security and other edge security controls
+- DHCP snooping, Dynamic ARP Inspection, and similar protections
+- QoS marking close to the source
+- Power over Ethernet for phones, access points, and cameras
 
-- Access layer is typically where end hosts connect to network
-- That includes end-user devices like PCs and phones
-- Security devices like security cameras and door locks
-- Servers, and others
-- Given that, here are some features you can expect to find in access layer of campus LAN:
-  - QoS marking is often done here. As mentioned in chapter on QoS, marking should be done early in packet's life
-  - Security services such as Port Security, DHCP Snooping, and DAI should be used here to secure point where users connect to network
-  - Switches will likely support PoE to provide electrical power to devices like IP phones, wireless access points, security cameras, etc.
+### Distribution layer characteristics
 
-### Distribution Layer
+- Aggregates multiple access switches
+- Often connects to WAN, internet, and data center
+- Usually the border between Layer 2 and Layer 3
+- Links down to access switches are Layer 2 trunks
+- Links up to other parts of the network are Layer 3 routed ports
+- Distribution switches are multilayer and run a routing protocol such as OSPF
+- First hop redundancy protocol (for example HSRP) used on SVIs for default gateways
 
-- With more than two or three access switches at site, directly interconnecting them all quickly becomes impractical
-- Instead, distribution switches are used to aggregate connections from access switches
-- Distribution layer also typically connects to corporate WAN and/or internet
-- Distribution layer usually serves as border between Layer 2 and Layer 3 of TCP/IP model
-- Connections from distribution layer to access switches are Layer 2 connections (trunk links)
-- But connections to other parts of network are Layer 3 connections (routed ports configured with `no switchport`)
-- Distribution switches are multilayer switches that support both Layer 2 and Layer 3 features
+### Multiple distribution blocks
 
-### Distribution Layer Configuration
+- When access switch count or port count grows, add another distribution block
+- Links between distribution switches often form a full mesh
+- Access to distribution links form a partial mesh
+- Access switches connect to both distribution switches in the block, not to each other
 
-- To provide redundant IP address that hosts in each VLAN can use as their default gateway
-- Distribution switches should use first hop redundancy protocol like HSRP on each of their SVIs
-- Furthermore, routing protocol like OSPF can be used to share routing information with rest of network
-- Example configuration shows how you might configure SVI of distribution switch:
-  - Configure VLAN SVI
-  - Configure IP address
-  - Configure HSRP virtual IP
-  - Increase SVI's HSRP priority
-  - Enable OSPF on SVI
+## Three tier campus LAN
 
-### Multiple Distribution Blocks
+### When to add a core layer
 
-- As two-tier campus LAN expands, may need to add additional block of distribution switches
-- Perhaps company is opening another office in new building
-- And number of access switches is more than current distribution switches can handle
-- Current switches don't have enough available ports
-- Connections between distribution switches form full mesh
-- And connections between access and distribution switches form partial mesh
-- Access switches connect to each distribution switch but not to each other
+- With many distribution blocks, a full mesh between them becomes complex and expensive
+- Cisco guidance is to add a core layer when there are three or more distribution blocks
+- Core layer reduces the number of required links and simplifies design
 
-## Three-Tier Campus LAN
+### Core layer characteristics
 
-### Three-Tier Overview
+- Aggregates all distribution blocks
+- Uses high performance switches
+- Priority is speed and resilience
+- Uses Layer 3 links to avoid Spanning Tree blocking
+- Runs a routing protocol with the distribution layer
+- Avoids CPU heavy features such as detailed security inspection or QoS marking
+- Trusts existing QoS markings rather than remarking
 
-- Large campus LANs often face challenge of managing connectivity as they grow
-- Full mesh between distribution switches might work well for smaller networks with couple of distribution blocks
-- However, with three, four, or even more distribution blocks, this approach quickly escalates in complexity and cost
-- In campus LAN with three or more distribution blocks, should consider adding core layer
-- Making three-tier architecture
-- Adding core layer can greatly reduce number of connections required
-- Another option to reduce number of connections required is to use partial mesh between distribution switches instead of full mesh
-- However, Cisco's recommendation is to add core when there are three or more distribution blocks
+## Data center networks
 
-### Core Layer
+### Data center definition
 
-- Just as distribution layer aggregates connections from access layer
-- Core layer aggregates connections from distribution layer
-- Using high-end switches, focus of core layer is speed and reliability
-- It should forward packets as quickly as possible
-- And be able to maintain consistent connectivity throughout LAN even if failures occur
-- CPU-intensive operations like security features (DAI, etc.) and QoS marking, which can slow down forwarding process
-- Should be avoided at core layer
-- Switches in core layer should trust and forward packets based on packets' existing QoS markings
-- All connections between core and distribution layers should be Layer 3 connections
-- We don't want STP disabling links that could otherwise be used to forward packets
-- Routing protocol like OSPF should be used to share routing information between distribution and core switches
+- Central facility for servers, storage, and supporting network devices
+- Can be its own site or a dedicated space in a larger building
+- Often hosts application servers, databases, virtualization clusters, and storage arrays
 
-### Three-Tier Example
+### Traditional three tier data center
 
-- Three-tier campus LAN with core layer connecting three distribution blocks
-- One distribution block is used to connect to network services like wireless LAN controller, WAN, and internet
-- To avoid cluttering up diagrams, only few access switches and end hosts are shown in each diagram
-- In large network, there could be 20+ access switches in each access block
-- Each with 40+ end hosts connected
+- Similar to three tier campus design
+- Layers:
+  - Access layer: connects servers
+  - Aggregation layer: aggregates access and applies services
+  - Core layer: connects aggregation blocks and upstream networks
+- Access plus aggregation plus servers is often called a pod
 
-## Data Center Networks
+### East west and north south traffic
 
-### Data Center Definition
+- East west traffic  
+  - Flows between servers inside the same data center
+  - For example, between application and database servers
+- North south traffic  
+  - Enters or leaves the data center
+  - For example, user traffic coming from WAN or internet
+- Traditional three tier design can introduce extra hops for east west traffic
 
-- Data center is facility—either its own building or dedicated space in building
-- Where organization centralizes its IT infrastructure
-- Particularly servers and network infrastructure devices that support them
-- Data centers are vital for many modern enterprise networks
-- Often housing thousands of servers, storage devices, and network devices
+## Spine leaf architecture
 
-### Traditional Three-Tier Data Center
+### Spine leaf overview
 
-- Data center networks traditionally used three-tier architecture similar to campus LANs we saw in previous section
-- Note that distribution layer is typically called aggregation layer in data center context
-- Their function is basically same
-- Three-tier data center LAN consists of access layer, aggregation layer, and core layer
-- In data center network, each group of servers and access and aggregation switches that support them are called pod
+- Modern data centers often use spine leaf (Clos) architecture
+- Designed to give predictable latency and high bandwidth for east west traffic
+- Two layers only: spine switches and leaf switches
 
-### East-West Traffic
+### Spine leaf characteristics
 
-- Rise of virtual servers and distributed applications led to increase in amount of east-west traffic in data centers
-- East-west traffic is traffic flowing between servers within same data center
-- For example, communication between server in pod 1 and server in pod 3
-- North-south traffic is traffic entering and exiting data center (via WAN or internet)
-- Traditional three-tier architecture proved to be less than ideal for these kinds of applications
-- Especially if traffic had to traverse multiple layers to reach another server in same data center
-- This produces bottlenecks and variability in server-to-server latency
-- Leading to unpredictability in application performance
+- Servers connect only to leaf switches
+- Each leaf switch connects to every spine switch
+- Each spine switch connects to every leaf switch
+- Leaf switches do not connect directly to other leaves
+- Spine switches do not connect directly to other spines
+- Leaf switches that connect to external networks are sometimes called border leaves
 
-## Spine-Leaf Architecture
+### Consistent latency
 
-### Spine-Leaf Overview
-
-- To better serve modern data center networks, spine-leaf architecture (also called Clos architecture, named after American engineer Charles Clos) has become standard
-- Spine-leaf architecture provides high bandwidth with low and predictable latency for east-west traffic
-- Spine-leaf architecture consists of two layers: layer of spine switches and layer of leaf switches
-
-### Spine-Leaf Characteristics
-
-- End hosts (servers) connect to leaf switches
-- Every leaf switch connects to every spine switch
-- Every spine switch connects to every leaf switch
-- Leaf switches do not connect to other leaf switches
-- Spine switches do not connect to other spine switches
-
-### Consistent Latency
-
-- Key result of this architecture is that all leaf switches are same number of hops apart
-- This means that path packet takes between two servers is always:
-  - Source server
-  - Leaf switch
-  - Spine switch
-  - Leaf switch
+- Path between servers on different leaves is always:
+  - Source server  
+  - Source leaf  
+  - Spine  
+  - Destination leaf  
   - Destination server
-- Consistent number of hops means that there should be consistent and predictable latency between servers in network
-- One exception is when two servers are connected to same leaf switch
-- In which case there is no need to traverse spine switch, making latency even shorter
+- Same number of hops between any two leaves
+- Servers on the same leaf skip the spine and have even lower latency
 
 ### Scalability
 
-- Another benefit of spine-leaf architecture is how simple it is to scale it to support large and complex data center networks
-- If you need to add more servers than current network can handle, just add more leaf switches
-- Connecting each new leaf to every spine switch
-- Leaf switches that connect to WAN/internet or other external networks are sometimes called border leaves
+- To add more servers, add more leaf switches
+- Each new leaf connects to all spines
+- Spine capacity can be increased by adding spine switches and adjusting uplink count per leaf
+- Design scales in a predictable way
 
-## Small Office/Home Office (SOHO) Networks
+## Small office and home office (SOHO) networks
 
-### SOHO Overview
+### SOHO overview
 
-- In some networks, complex designs we've looked at aren't necessary
-- Network with only few users, each with only few devices, can often have its needs met by single network device
-- Small office/home office (SOHO) network—very small network with about 1 to 10 users—is example
-- Because of their size and simplicity, it's common for all networking functions in SOHO to be provided by single wireless router (also called Wi-Fi router or home router)
+- Very small networks, often 1 to 10 users
+- Typical for homes and small businesses
+- Simpler needs than enterprise or data center networks
 
-### Wireless Router Functions
+### Wireless router functions
 
-- Wireless router combines functions of various network devices into one:
-  - Router that forwards packets between LAN and internet
-  - Switch for wired end-user devices to connect to
-  - Firewall that blocks connections from internet
-  - Wireless access point that allows wireless (Wi-Fi) clients to connect to network
-- Wireless router includes Wi-Fi antennas for wireless clients
-- Switch ports for wired end-user devices
-- Port for internet connection
+- Single device often provides most services:
+  - Router between LAN and internet
+  - Ethernet switch for wired devices
+  - Wireless access point for Wi-Fi clients
+  - Basic firewall functions
+  - Sometimes an integrated modem
+- Good enough for small sites that do not require high availability
 
-### SOHO Redundancy
+### SOHO redundancy
 
-- In addition to relying on single wireless router, most SOHO networks have only one internet connection
-- This lack of redundancy isn't acceptable in enterprise networks like ones we covered in previous sections
-- However, given nature of most SOHO networks, temporary loss of service would be more of inconvenience than emergency
-- Cost savings of nonredundant setup are usually prioritized over reliability of redundant one
+- Usually only one router and one internet connection
+- No redundant paths or devices
+- Outages are usually an inconvenience rather than a critical event
+- Enterprise networks use more complex redundant designs to avoid downtime
 
-## Real-World Applications
+## Troubleshooting and design notes
 
-- **Campus networks**: Connecting multiple buildings in office park or university campus
-- **Data center networks**: Supporting thousands of servers and storage devices
-- **SOHO networks**: Providing connectivity for small businesses and home offices
-- **Scalability**: Designing networks that can grow with organization
-- **Redundancy**: Implementing high availability in enterprise networks
-- **Cost optimization**: Balancing performance and reliability with budget constraints
+- Check which layers exist at the site: two tier or three tier
+- Confirm where Layer 2 stops and Layer 3 starts
+- Identify star, mesh, and spine leaf patterns in diagrams
+- Look for redundant links and verify that routing and FHRP settings match the design
+- In data centers, consider how many hops east west traffic takes
+- In SOHO, focus on the single wireless router and internet link
 
-## Troubleshooting
+## Quick review
 
-### Common Issues
-
-- **Connectivity problems**: Verify layer boundaries and routing configuration
-- **Performance issues**: Check for bottlenecks at core or distribution layers
-- **Redundancy failures**: Verify FHRP and routing protocol configuration
-- **Scalability problems**: Consider adding core layer or additional blocks
-
-### Troubleshooting Steps
-
-1. Verify layer configuration: Check access, distribution, and core layer setup
-2. Check routing: Verify routing protocols and default gateways
-3. Test connectivity: Ping and trace routes between layers
-4. Review topology: Ensure physical connections match logical design
-5. Check redundancy: Verify FHRP and failover mechanisms
-
-## Best Practices
-
-- Use hierarchical design with clear layer boundaries
-- Implement appropriate security features at access layer
-- Use FHRP for redundant default gateways
-- Configure routing protocols for dynamic routing
-- Avoid CPU-intensive operations at core layer
-- Use Layer 3 connections at core and distribution layers
-- Plan for scalability from beginning
-- Document network architecture and design decisions
-- Test redundancy and failover mechanisms
-- Consider cost vs. performance tradeoffs
-
-## Summary
-
-- Although there are standard best practices in network design, many factors such as budget, scale, and specific needs influence "right" approach
-- In star topology, all devices connect to one central device
-- Most common example is group of end hosts connected to switch
-- Another name for star topology is hub-and-spoke topology
-- Star is more commonly used in LAN context, and hub-and-spoke in WAN context
-- In full-mesh topology, each device in topology is directly connected to each of other devices
-- Full mesh is often seen between distribution switches of two-tier campus LAN
-- In partial-mesh topology, certain devices, but not all, are directly connected to each other
-- Can find this pattern between access and distribution switches of two- or three-tier campus LAN
-- Most networks are combination of these common topologies and others—hybrid topology
-- Campus LAN is network that is designed to serve networking needs of local users within certain area
-- Cisco campus LANs use hierarchical design, dividing network into three modular layers: access, distribution, and core
-- Layers are modular, allowing for flexible scalability
-- These modular pieces are sometimes called blocks
-- Additional blocks can be added as network expands
-- In two-tier campus LAN, only access and distribution layers are present
-- For this reason, it's sometimes called collapsed-core architecture
-- Access layer is typically where end hosts connect to network
-- Some common features implemented at access layer are QoS, security services (i.e. Port Security, DHCP Snooping, and DAI), and PoE
-- Distribution layer aggregates connections from access layer and also typically connects to corporate WAN and/or internet
-- Distribution layer usually serves as border between Layer 2 and Layer 3 of TCP/IP model
-- Connections to access switches are Layer 2 connections, but connections to other parts of network are Layer 3 connections
-- Distribution switches typically use FHRP (like HSRP) on their SVIs to provide redundant default gateway to hosts in LAN
-- And routing protocol like OSPF to share routing information with rest of network
-- In campus LAN with three or more distribution blocks, should consider adding core layer—three-tier architecture
-- Core layer aggregates connections from distribution layer, reducing overall number of connections required
-- Focus of core layer is speed and reliability
-- It should forward packets as quickly as possible and be able to maintain consistent connectivity throughout LAN even if failures occur
-- CPU-intensive operations like security features and QoS marking, which can slow down forwarding process, should be avoided at core layer
-- All connections should be Layer 3
-- Data center is facility where organization centralizes its IT infrastructure, particularly servers and network infrastructure devices that support them
-- Data center networks traditionally used three-tier architecture similar to campus LANs (with distribution layer being called aggregation layer in data center contexts)
-- In data center network, each group of servers and access and aggregation switches that support them are called pod
-- Rise of virtual servers and distributed applications led to increase in amount of east-west traffic in data centers
-- East-west traffic is traffic flowing between servers within same data center
-- North-south traffic is traffic entering and exiting data center (via WAN or internet)
-- Traditional three-tier architecture is not ideal for east-west traffic
-- It can lead to bottlenecks and variability in server-to-server latency
-- Spine-leaf architecture has become standard in modern data center networks
-- Spine-leaf architecture consists of two layers: layer of spine switches and layer of leaf switches
-- End hosts (servers) connect to leaf switches
-- Leaf switches that connect to WAN/internet or other external networks are sometimes called border leaves
-- Every leaf switch connects to every spine switch, and every spine switch connects to every leaf switch
-- Leaf switches do not connect to other leaf switches, and spine switches do not connect to other spine switches
-- Result of this architecture is that all leaf switches are same number of hops apart
-- They are all separated by one spine switch
-- Consistent number of hops means that there should be consistent and predictable latency between servers in network
-- Only exception is when two servers are connected to same leaf switch
-- Spine-leaf architecture can be easily scaled by adding more leaf switches, connecting each new leaf to every spine switch
-- Small office/home office (SOHO) network is very small network, usually with 1 to 10 users (i.e., small business or home network)
-- It's common for all networking functions in SOHO network to be provided by single wireless router (also called Wi-Fi router or home router)
-- Wireless router combines functions of various network devices into one: router, switch, firewall, wireless access point, and sometimes modem (modulator-demodulator)
-- Most SOHO networks prioritize cost savings with single router and internet connection, trading off redundancy found in enterprise networks
+- Common physical topologies include star, full mesh, partial mesh, and hybrids.  
+- Campus LANs use access, distribution, and core layers, combined into two tier or three tier designs.  
+- Two tier (collapsed core) networks use access and distribution only and are common in smaller sites.  
+- Distribution layer aggregates access switches, connects toward WAN or internet, and often acts as the Layer 2 and Layer 3 boundary.  
+- Three tier designs add a core layer when there are several distribution blocks, improving scalability and reducing link count.  
+- Data centers now often use spine leaf architecture to provide consistent latency and bandwidth for server to server traffic.  
+- SOHO networks rely on a single wireless router that combines router, switch, firewall, and access point functions, with little or no redundancy.

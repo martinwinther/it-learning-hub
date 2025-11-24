@@ -2,224 +2,214 @@
 
 ## Overview
 
-Extended Access Control Lists provide more granular packet filtering than standard ACLs. While standard ACLs only match packets based on source IP address, extended ACLs can match packets based on protocol, source and destination IP addresses, and source and destination port numbers. This allows for precise control over which types of traffic are permitted and denied, making extended ACLs essential for implementing detailed security policies.
+Extended Access Control Lists (ACLs) match on more fields than standard ACLs. They can filter traffic based on protocol, source and destination IP addresses, and source and destination port numbers. This allows precise control over which traffic is permitted or denied.
 
-## Extended ACL Fundamentals
+## Fundamentals
 
-### Similarities to Standard ACLs
+### Similarities with standard ACLs
 
-- ACEs processed in order from top to bottom
-- Implicit deny discards all traffic not matched by explicitly configured ACEs
-- Must be applied to interface in inbound and/or outbound direction to take effect
-- Same basic evaluation process: first match determines action
+- Access control entries (ACEs) are processed from top to bottom
+- The first matching ACE decides the action
+- An implicit deny exists at the end of every ACL
+- ACLs have no effect until applied to an interface in a direction
 
-### Extended ACL Matching Parameters
+### Matching fields
 
-Extended ACLs can match packets based on:
+Extended ACLs can match on:
 
-- **Protocol**: TCP, UDP, ICMP, OSPF, IP (all IPv4), etc.
-- **Source IP address**: Specific host, subnet, or any
-- **Destination IP address**: Specific host, subnet, or any
-- **Source port**: TCP/UDP port numbers (when protocol is TCP or UDP)
-- **Destination port**: TCP/UDP port numbers (when protocol is TCP or UDP)
+- Protocol
+- Source IP address
+- Destination IP address
+- Source port (TCP or UDP)
+- Destination port (TCP or UDP)
 
-### Packet Matching Requirements
+A packet must match every field in an ACE to be considered a match.
 
-- Packet must match **all** specified parameters in ACE to be considered a match
-- Partial matches don't count
-- If ACE specifies protocol, source IP, source port, destination IP, and destination port, all five must match
+## Configuration
 
-## Extended ACL Configuration
+### Numbered extended ACLs
 
-### Numbered ACL Configuration
+- Created in global configuration mode
+- Number ranges:
+  - 100 to 199
+  - 2000 to 2699
+- Basic syntax:
 
-- Configure in global config mode
-- Command syntax: `access-list number {permit | deny} protocol source destination`
-- Extended numbered ACLs use ranges 100-199 or 2000-2699
-- Configure each ACE sequentially from top to bottom
+  ```text
+  access-list <number> {permit | deny} <protocol> <source> <destination> [port-options]
+  ```
 
-### Named ACL Configuration
+- ACEs are entered in the order they should be evaluated
 
-- Create in global config mode: `ip access-list extended {name | number}`
-- Configure ACEs in extended named ACL config mode
-- Command syntax: `[seq-num] {permit | deny} protocol source destination`
-- Modern IOS allows configuring numbered ACLs in named ACL config mode
+### Named extended ACLs
 
-### Protocol Argument
+- Created with:
 
-- Specify keyword to match packets carrying specific protocol:
-  - `icmp`: ICMP packets
-  - `tcp`: TCP packets
-  - `udp`: UDP packets
-  - `ospf`: OSPF packets
-  - `ip`: All IPv4 packets (use when protocol doesn't matter)
+  ```text
+  ip access-list extended <name-or-number>
+  ```
 
-### Source and Destination Arguments
+- Within ACL configuration mode, use:
 
-Options for source and destination IP addresses:
+  ```text
+  [sequence] {permit | deny} <protocol> <source> <destination> [port-options]
+  ```
 
-- `any`: Matches all possible IP addresses (equivalent to 0.0.0.0 255.255.255.255)
-- `host ip-addr`: Matches only specified IP address (equivalent to ip-addr 0.0.0.0)
-- `ip-addr wildcard-mask`: Matches specified range of IP addresses
+- Sequence numbers control ACE order and allow later insertion or deletion
+- Modern IOS allows numbered ACLs to be edited in named ACL mode
 
-### Matching Single IP Address in Extended ACLs
+### Protocol field
 
-- Cannot simply specify IP address without keyword or wildcard mask (unlike standard ACLs)
-- Must use: `host 8.8.8.8` or `8.8.8.8 0.0.0.0`
-- Both methods are equivalent
+Common protocol keywords:
 
-## Port Number Matching
+- `ip` for all IPv4 traffic
+- `tcp` for TCP
+- `udp` for UDP
+- `icmp` for ICMP
+- `ospf` for OSPF
 
-### When Port Numbers Apply
+Using `ip` ignores port numbers and matches all IPv4 packets between the specified source and destination.
 
-- Port numbers can only be specified when protocol is TCP or UDP
-- Cannot specify ports for ICMP, OSPF, or IP protocols
+### Address field
 
-### Port Number Syntax
+Source and destination address options:
 
-- Command syntax: `{permit | deny} {tcp | udp} src-ip [operator src-port] dst-ip [operator dst-port]`
-- Can specify source port, destination port, both, or neither
-- If port not specified, all ports will match
+- `any` matches any address  
+  Equivalent to `0.0.0.0 255.255.255.255`
+- `host A.B.C.D` matches a single IP address  
+  Equivalent to `A.B.C.D 0.0.0.0`
+- `A.B.C.D W.X.Y.Z` matches a range with a wildcard mask
 
-### Port Operators
+In extended ACLs, a single IP address must be written as `host A.B.C.D` or `A.B.C.D 0.0.0.0`. Just writing the IP without a keyword is not allowed.
 
-- `eq port`: Equal to port number
-- `gt port`: Greater than port number (not including port)
-- `lt port`: Less than port number (not including port)
-- `neq port`: Not equal to port number (anything other than port)
-- `range port1 port2`: From port1 to port2 (including both)
+## Port matching
 
-### Port Number Keywords
+### When ports apply
 
-Some common protocols have keywords that can be used instead of port numbers:
+- Port numbers are used only with TCP or UDP
+- Ports cannot be specified with `icmp`, `ospf`, or `ip`
 
-- TCP 20 (FTP data) = `ftp-data`
-- TCP 21 (FTP control) = `ftp`
-- TCP 23 (Telnet) = `telnet`
-- TCP/UDP 53 (DNS) = `domain`
-- UDP 67 (DHCP server) = `bootps`
-- UDP 68 (DHCP client) = `bootpc`
-- UDP 69 (TFTP) = `tftp`
-- TCP 80 (HTTP) = `www`
-- TCP 443 (HTTPS) = no keyword (must use `eq 443`)
+Basic format:
 
-### Client-Server Port Usage
+```text
+{permit | deny} {tcp | udp} <src-ip> [src-operator src-port] <dst-ip> [dst-operator dst-port]
+```
 
-- When host uses protocol to access resources on server, it uses protocol's port number as **destination port**
-- Source port is typically ephemeral port (49152-65535)
-- To filter client-to-server traffic, match based on **destination port**, not source port
-- Example: HTTP traffic from client to server uses destination port 80
+If ports are omitted, all ports match.
 
-## Extended ACL Placement
+### Port operators
 
-### Placement Guidelines
+Operators are placed before the port value:
 
-- **Standard ACLs**: Apply as close to destination as possible
-- **Extended ACLs**: Apply as close to source as possible
-- Extended ACLs provide more control over which packets are filtered
-- Applying close to source prevents packets from traveling across network just to be discarded
-- More efficient use of network resources
+- `eq` port equal to the given port
+- `gt` port greater than the given port
+- `lt` port less than the given port
+- `neq` port not equal to the given port
+- `range` port between two values, including both
 
-### Why Close to Source
+Example:
 
-- Extended ACLs can precisely identify which traffic to block
-- Won't inadvertently block legitimate traffic from source
-- Prevents unnecessary network traffic
-- Reduces processing load on network devices
+```text
+permit tcp any any eq 443
+deny udp any any range 1 1023
+```
 
-## Editing ACLs
+### Port keywords
 
-### Deleting ACEs from Numbered ACLs
+Some common services have keywords instead of numbers:
 
-- **From global config mode**: Cannot delete individual ACEs
-- Using `no access-list number ...` deletes entire ACL
-- **From named ACL config mode**: Can delete individual ACEs
-- Use `no sequence-number` to delete specific ACE
-- Example: `no 30` deletes ACE with sequence number 30
+- `ftp-data` for TCP 20
+- `ftp` for TCP 21
+- `telnet` for TCP 23
+- `domain` for TCP or UDP 53
+- `bootps` for UDP 67 (DHCP server)
+- `bootpc` for UDP 68 (DHCP client)
+- `tftp` for UDP 69
+- `www` for TCP 80
 
-### Inserting New ACEs
+There is no keyword for HTTPS, so port 443 uses `eq 443`.
 
-- Named ACL config mode allows inserting ACEs between existing ones
-- Specify sequence number at beginning of command
-- Example: `30 deny 192.168.4.0 0.0.0.255` inserts ACE at sequence 30
-- Default sequence numbers (10, 20, 30, etc.) leave room for insertion
+### Client and server ports
 
-### Resequencing ACLs
+- Server applications listen on well known ports
+- Clients use ephemeral source ports in a high range
+- Initial client to server traffic has:
+  - Source port: high ephemeral port
+  - Destination port: server well known port
 
-- Command: `ip access-list resequence {name | number} starting-seq-num increment`
-- Automatically adjusts sequence numbers of all ACEs
-- `starting-seq-num`: New sequence number for first ACE
-- `increment`: Increment for each subsequent ACE
-- Example: `ip access-list resequence 2 10 10` sets first ACE to 10, second to 20, etc.
-- Useful when sequence numbers become too close together
+For most ACLs that control access to services, matching on the destination port is enough.
 
-## Real-World Applications
+## Placement
 
-- **Protocol-specific filtering**: Allow only specific protocols (e.g., HTTPS only)
-- **Port-based access control**: Restrict access to specific services (e.g., block HTTP but allow HTTPS)
-- **Granular security policies**: Implement detailed security requirements
-- **Service filtering**: Control which services can be accessed from specific networks
-- **ICMP control**: Allow ping from specific sources while blocking others
-- **Application-layer filtering**: Control access to specific applications based on port numbers
+### Placement guidelines
 
-## Troubleshooting Extended ACLs
+- Extended ACLs should be placed as close to the source as practical
+- Standard ACLs are usually placed closer to the destination
+- Placing extended ACLs near the source:
+  - Stops unwanted traffic early
+  - Saves bandwidth and processing on downstream devices
 
-### Common Issues
+When designing ACLs, consider both the direction and the interface to avoid blocking legitimate traffic.
 
-- **ACL too restrictive**: Check if all required traffic is explicitly permitted
-- **Wrong ports matched**: Verify client uses destination port, not source port
-- **Protocol mismatch**: Ensure protocol keyword matches actual traffic
-- **ACE order**: More specific rules should come before less specific ones
-- **Implicit deny**: Remember implicit deny blocks all unmatched traffic
+## Editing and resequencing
 
-### Troubleshooting Steps
+### Numbered ACL limitations
 
-1. Verify ACL configuration: `show access-lists [name | number]`
-2. Check interface application: `show ip interface [interface]`
-3. Verify protocol and port specifications are correct
-4. Test connectivity with specific protocols and ports
-5. Review ACE order for proper specificity
-6. Check for shadowed rules
+- Numbered ACLs created with `access-list` cannot remove single ACEs from global configuration mode
+- `no access-list <number>` deletes the entire ACL
 
-### Verification Commands
+### Named ACL advantages
 
-- `show access-lists`: View all ACLs with sequence numbers
-- `show ip access-lists`: View only IP ACLs
-- `show ip interface [interface]`: View applied ACLs on interface
-- `show running-config | include access-list`: View ACL configuration
+- Allows individual ACE deletion:
 
-## Best Practices
+  ```text
+  no <sequence-number>
+  ```
 
-- Apply extended ACLs as close to source as possible
-- Configure more specific ACEs before less specific ones
-- Use named ACLs when editing is likely needed
-- Specify both source and destination when possible for precision
-- Use port numbers to filter specific services
-- Document ACL purpose and requirements
-- Test ACLs in lab before production deployment
-- Review ACLs regularly for effectiveness
-- Use protocol keywords when available for readability
-- Remember client-to-server traffic uses destination port
-- Consider implicit deny when designing ACLs
-- Use resequence command to maintain proper spacing between ACEs
+- Allows inserting ACEs by picking sequence numbers between existing entries
+- Example:
 
-## Summary
+  ```text
+  10 permit tcp any host 192.0.2.10 eq 22
+  20 deny   ip any any
+  ```
 
-- Extended ACLs provide more granular filtering than standard ACLs
-- Can match packets based on protocol, source/destination IP addresses, and source/destination ports
-- Packet must match all specified parameters in ACE to be considered a match
-- Extended numbered ACLs use ranges 100-199 or 2000-2699
-- Configure with `access-list number {permit | deny} protocol source destination`
-- Named ACLs created with `ip access-list extended {name | number}`
-- Protocol argument can be icmp, tcp, udp, ospf, ip (all IPv4), etc.
-- Source/destination can be any, host ip-addr, or ip-addr wildcard-mask
-- Port numbers can only be specified for TCP and UDP protocols
-- Port operators: eq, gt, lt, neq, range
-- Some protocols have keywords (ftp, telnet, domain, tftp, www, etc.)
-- Client-to-server traffic uses destination port (not source port)
-- Extended ACLs should be applied as close to source as possible
-- Can delete individual ACEs in named ACL config mode with `no sequence-number`
-- Can insert new ACEs between existing ones by specifying sequence number
-- Use `ip access-list resequence` to adjust sequence numbers automatically
-- Always verify ACL configuration and application with show commands
+### Resequencing
 
+- Command:
+
+  ```text
+  ip access-list resequence <name-or-number> <start> <increment>
+  ```
+
+- Renumbers all ACEs in the ACL
+- Helpful when sequence numbers are too close together to allow new entries
+
+## Troubleshooting and verification
+
+### Common issues
+
+- ACL too restrictive, missing required permits
+- Ports or protocols do not match the actual traffic
+- ACE order causes specific entries to be shadowed by earlier ones
+- ACL applied in the wrong direction or on the wrong interface
+- Implicit deny at the end blocking traffic that was never explicitly permitted
+
+### Useful commands
+
+- `show access-lists`
+- `show ip access-lists`
+- `show ip interface <interface>`
+- `show running-config | include access-list`
+
+These commands show ACE order, match counters, and where ACLs are applied.
+
+## Quick review
+
+- Extended ACLs match on protocol, addresses, and ports for more precise filtering than standard ACLs.
+- Numbered extended ACLs use ranges 100 to 199 and 2000 to 2699.
+- Named ACLs provide better editing options with sequence numbers, deletion, insertion, and resequencing.
+- Port matching is valid only for TCP and UDP and uses operators such as `eq`, `gt`, `lt`, `neq`, and `range`.
+- Common service ports have keywords such as `ftp`, `telnet`, `domain`, `tftp`, and `www`.
+- Extended ACLs are usually placed close to the source network to drop unwanted traffic early.
+- Troubleshooting focuses on ACE order, correct protocol and port usage, and confirming where the ACL is applied.

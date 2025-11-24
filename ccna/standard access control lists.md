@@ -2,264 +2,248 @@
 
 ## Overview
 
-Access Control Lists (ACLs) are ordered lists of rules that filter packets as they enter or exit router interfaces. They function as packet filters, examining each packet and determining whether it should be allowed or blocked based on predefined rules. Standard ACLs filter packets based on a single parameter: the source IP address. ACLs are essential tools for implementing network security requirements and controlling access to network resources.
+Standard Access Control Lists (ACLs) are ordered lists of rules that filter IPv4 packets as they enter or leave router interfaces. Standard ACLs match on the source IP address only and apply a permit or deny action. They are a basic tool for enforcing simple security policies and controlling access between subnets.
 
-## How ACLs Work
+## How standard ACLs work
 
-### ACL Fundamentals
+### ACL fundamentals
 
-- ACLs function like if-then-else conditionals in programming
-- Evaluate conditions and take actions based on results
-- Each ACL consists of series of rules called Access Control Entries (ACEs)
-- Each ACE specifies:
-  - Matching condition (IP address or range of IP addresses)
-  - Action (permit or deny)
+- ACLs act like ordered if-then rules  
+- Each rule is an Access Control Entry (ACE)  
+- Each ACE contains:
+  - Match condition (source IP address or range)  
+  - Action (permit or deny)  
 
-### Packet Evaluation Process
+### Packet evaluation
 
-- Router evaluates packets against ACL sequentially from top to bottom
-- Once packet matches an ACE, router takes specified action (permit or deny)
-- Router does not process remaining ACEs after match is found
-- Order of ACEs is very important; it influences overall effect of ACL
+- Router checks ACL from top to bottom  
+- First matching ACE decides the action  
+- Remaining ACEs are ignored once a match is found  
+- Order of ACEs directly affects behavior  
 
-### Permit and Deny Actions
+### Permit, deny, and implicit deny
 
-- **Permit**: Packet is forwarded
-- **Deny**: Packet is discarded
-- Packets are evaluated against each ACE in order until match is found
+- `permit`  
+  Matching packets are allowed through the interface
 
-### Implicit Deny
+- `deny`  
+  Matching packets are dropped and not forwarded
 
-- At end of every ACL, there is hidden rule that denies all unmatched packets
-- Called implicit deny
-- Ensures secure stance: only traffic explicitly permitted by ACL is forwarded
-- Everything else is automatically discarded
-- If packet doesn't match any explicitly defined conditions, it is denied
+- Implicit deny  
+  - Every ACL ends with an invisible `deny any`  
+  - Packets that do not match any ACE are dropped  
+  - At least one permit is required or all traffic will be blocked  
 
-### Shadowed Rules
+### Shadowed entries
 
-- ACE that will never be acted upon because it is preceded by less specific rule
-- Less specific rule covers the matching condition of the shadowed rule
-- Example: If permit 192.168.0.0/16 comes before deny 192.168.1.0/24, the deny rule is shadowed
-- Should not occur in properly configured ACL
-- Always configure more specific rules first
+- ACE that can never match because an earlier ACE already covers that traffic  
+- Example:
+  - `permit 192.168.0.0 0.0.255.255`
+  - `deny   192.168.1.0 0.0.0.255`  (shadowed)  
+- More specific ACEs should appear before less specific ACEs  
 
-## Applying ACLs to Interfaces
+## Interface application
 
-### ACL Application Requirement
+### Inbound vs outbound
 
-- Creating ACL doesn't affect router behavior on its own
-- ACL must be applied to one or more interfaces to take effect
-- Can be applied in inbound direction, outbound direction, or both
+- Inbound ACL  
+  - Packets are checked as they enter an interface  
+  - If permitted, normal routing continues  
+  - If denied, packet is dropped immediately  
 
-### Inbound ACLs
+- Outbound ACL  
+  - Packets are checked as they leave an interface  
+  - Used after routing has chosen an exit interface  
 
-- Evaluate packets as they enter the interface
-- Every time router receives packet on interface, router evaluates packet against ACL
-- If ACL permits packet, router continues to process packet
-- If ACL denies packet, router discards it
+### One ACL per direction
 
-### Outbound ACLs
+- Each interface supports:
+  - One inbound ACL  
+  - One outbound ACL  
+- Standard ACL and extended ACL cannot both be applied in the same direction on the same interface  
 
-- Evaluate packets as they exit the interface
-- If router determines packet should be forwarded out of interface, router first evaluates packet against ACL
-- If ACL permits packet, router forwards it
-- If ACL denies packet, router discards it
+### Placement guidelines
 
-### Interface Limitations
+- Standard ACLs filter only by source address  
+- Usual guideline:
+  - Place standard ACLs **close to the destination** being protected  
+- Outbound placement on the destination LAN interface is common  
+- Inbound placement can be used when blocking traffic as it enters the router is preferred  
 
-- Each interface can have maximum of one ACL applied in each direction
-- One inbound ACL and one outbound ACL per interface
+## ACL types and ranges
 
-### Placement Guidelines
+### Match scope
 
-- Standard ACLs should usually be applied outbound on interface connected to destination LAN you want to protect
-- This serves to filter packets destined for that LAN
-- Applying ACL inbound can be useful to block unwanted traffic from entering router
-- Ideal location and direction depend on desired result
+- Standard ACLs  
+  - Match source IPv4 address only  
 
-## ACL Types
+- Extended ACLs  
+  - Match source and destination addresses, protocols, and ports  
 
-### Categorization Methods
+### Identification
 
-ACLs can be categorized in two ways:
+- Numbered ACLs  
+  - Identified by a number  
 
-1. **Matching parameters**:
-   - Standard ACLs: Match based on source IP address only
-   - Extended ACLs: Match based on source/destination IP addresses, ports, protocols, and others
+- Named ACLs  
+  - Identified by a name  
 
-2. **Identification method**:
-   - Numbered ACLs: Identified by number
-   - Named ACLs: Identified by name
+### Number ranges
 
-### Four ACL Types for CCNA
+- Standard IPv4 ACLs  
+  - 1–99  
+  - 1300–1999  
 
-- Standard numbered ACL
-- Standard named ACL
-- Extended numbered ACL
-- Extended named ACL
+- Extended IPv4 ACLs  
+  - 100–199  
+  - 2000–2699  
 
-### Numbered ACL Ranges
+## Standard numbered ACLs
 
-- **Standard IP ACLs**: 1-99 and 1300-1999
-- **Extended IP ACLs**: 100-199 and 2000-2699
-- Original ranges (1-99, 100-199) were expanded to allow more ACLs
-- Must pick ACL number from appropriate range
+### Configuration
 
-## Standard Numbered ACLs
+- Configured in global configuration mode  
+- ACEs are added in order from top to bottom
 
-### Configuration Method
+Basic command:
 
-- Configured entirely from global config mode
-- Configure each ACE sequentially, from top to bottom
-- Order in which you configure ACEs is very important
-- Router processes ACEs in order they were configured
+```cisco
+access-list <number> {permit | deny} <source-ip> <wildcard-mask>
+```
 
-### Configuration Command
+- `<number>` must be in the standard ACL range  
+- Wildcard mask:
+  - 0 bit = must match  
+  - 1 bit = do not care  
 
-- Primary command: `access-list number {permit | deny} source-ip wildcard-mask`
-- Number argument must be in correct range (1-99 or 1300-1999 for standard ACLs)
-- Wildcard masks indicate bits that must match (0) and bits that don't have to match (1)
-- Can think of wildcard masks as inverse netmasks
+### Wildcard masks
 
-### Wildcard Mask Calculation
+- Calculated as: `255 - subnet mask` for each octet  
+- Examples:
+  - /24 (255.255.255.0) → 0.0.0.255  
+  - /16 (255.255.0.0)   → 0.0.255.255  
 
-- Shortcut: subtract each octet of netmask from 255
-- Example: /24 netmask (255.255.255.0) → wildcard mask 0.0.0.255
-- First three octets: 255 - 255 = 0
-- Final octet: 255 - 0 = 255
+### Remarks
 
-### Optional Remarks
+- Optional comment lines clarify ACL purpose:
 
-- Configure descriptive remark with: `access-list number remark remark-text`
-- Useful to clarify purpose of ACL
-- Example: `access-list 1 remark Block Engineering`
+  ```cisco
+  access-list 1 remark Block Engineering to ServerA
+  access-list 1 deny 192.168.10.0 0.0.0.255
+  access-list 1 permit any
+  ```
 
-### Verification Commands
+### Verification
 
-- `show access-lists`: View all ACLs
-- `show ip access-lists`: View only IP ACLs
-- Output shows sequence numbers automatically assigned to each ACE
+- `show access-lists`  
+  - Displays all ACLs and ACEs  
 
-### Sequence Numbers
+- `show ip access-lists`  
+  - Displays IP ACLs only  
 
-- First ACE given sequence number 10
-- Default increment is 10 (10, 20, 30, etc.)
-- Leaves room between ACEs to insert new ACEs if needed
-- Only possible to insert new ACEs in named ACL config mode
+- Output includes automatic sequence numbers (10, 20, 30, and so on)  
 
-### Applying Numbered ACLs
+### Applying numbered ACLs
 
-- Command: `ip access-group number {in | out}` in interface config mode
-- Verify with: `show ip interface [interface]`
-- Shows "Outgoing access list" or "Inbound access list" in output
+- Applied under interface configuration:
 
-## Standard Named ACLs
+  ```cisco
+  interface GigabitEthernet0/0
+   ip access-group 1 out
+  ```
 
-### Configuration Method
+- `show ip interface <name>`  
+  - Confirms ACLs applied inbound or outbound  
 
-- First created in global config mode
-- Each ACE configured in separate config mode (standard named ACL config mode)
-- Enter config mode: `ip access-list standard name`
-- Configure ACEs: `[seq-num] {permit | deny} source-ip wildcard-mask`
+## Standard named ACLs
 
-### Sequence Number Control
+### Configuration mode
 
-- Can optionally specify sequence number (seq-num) to control where ACE is inserted
-- Default: ACEs start at sequence 10 and increment by 10
-- Useful for inserting new ACEs between existing ones (e.g., at sequence 15)
+- Created in global configuration mode:
 
-### Matching Single IP Address
+  ```cisco
+  ip access-list standard BLOCK_USERS
+  ```
 
-Three ways to match single IP address (work for both numbered and named ACLs):
+- ACEs are added in ACL configuration mode:
 
-1. `deny 8.8.8.8` (simplest)
-2. `deny 8.8.8.8 0.0.0.0` (/32 wildcard mask)
-3. `deny host 8.8.8.8` (explicit host keyword)
+  ```cisco
+  ip access-list standard BLOCK_USERS
+   10 deny 192.168.10.0 0.0.0.255
+   20 permit any
+  ```
 
-### Any Keyword
+- Sequence numbers control ACE order and make edits easier  
 
-- `permit any` matches all IP addresses
-- Equivalent to `permit 0.0.0.0 255.255.255.255`
-- Can be used in both numbered and named ACLs
+### Matching single addresses
 
-### Applying Named ACLs
+Equivalent ways to match a single host:
 
-- Identical to applying numbered ACLs
-- Command: `ip access-group name {in | out}` in interface config mode
-- Example: `ip access-group BLOCK_MARTHA_BOB in`
+- `deny 8.8.8.8`  
+- `deny 8.8.8.8 0.0.0.0`  
+- `deny host 8.8.8.8`  
 
-### Numbered ACLs in Named Mode
+### Matching any address
 
-- Modern versions of Cisco IOS allow configuring numbered ACLs in named ACL config mode
-- Specify number instead of name: `ip access-list standard 99`
-- Provides benefits of named ACL mode (sequence numbers, easier editing)
-- After configuration, appears in running config as if configured using traditional method
+- `permit any`  
+  - Matches all IPv4 addresses  
+  - Equivalent to `permit 0.0.0.0 255.255.255.255`  
 
-## Real-World Applications
+### Applying named ACLs
 
-- **Department access control**: Restrict access to specific servers or networks by department
-- **Security policies**: Implement security requirements from security teams
-- **Network segmentation**: Control communication between different network segments
-- **Resource protection**: Protect sensitive servers from unauthorized access
-- **Traffic filtering**: Block unwanted traffic from entering or exiting network segments
-- **Compliance**: Meet regulatory requirements for network access control
+- Applied just like numbered ACLs, but with a name:
 
-## Troubleshooting Standard ACLs
+  ```cisco
+  interface GigabitEthernet0/0
+   ip access-group BLOCK_USERS in
+  ```
 
-### Common Issues
+### Numbered ACLs in named mode
 
-- **ACL not working**: Verify ACL is applied to correct interface in correct direction
-- **Unexpected traffic blocked**: Check ACE order; more specific rules should come first
-- **Shadowed rules**: Verify no less specific rules come before more specific ones
-- **All traffic blocked**: Check for implicit deny; ensure permit statements exist
-- **Wrong traffic permitted**: Verify wildcard masks are correct
+- Some IOS versions allow:
 
-### Troubleshooting Steps
+  ```cisco
+  ip access-list standard 10
+  ```
 
-1. Verify ACL configuration: `show access-lists [number | name]`
-2. Check interface application: `show ip interface [interface]`
-3. Verify ACE order: More specific rules should come first
-4. Test connectivity: Ping or other tests to verify ACL behavior
-5. Check for shadowed rules: Review ACE order carefully
+- This configures ACL 10 using named ACL style with sequence numbers  
+- Running configuration still shows ACL 10 as a numbered standard ACL  
 
-### Verification Commands
+## Troubleshooting standard ACLs
 
-- `show access-lists`: View all ACLs with sequence numbers
-- `show ip access-lists`: View only IP ACLs
-- `show ip interface [interface]`: View applied ACLs on interface
-- `show running-config | include access-list`: View ACL configuration
+### Common issues
 
-## Best Practices
+- ACL applied to wrong interface or wrong direction  
+- ACE order causing unexpected matches  
+- Wildcard masks not matching intended ranges  
+- Missing permit statements leaving only the implicit deny  
+- Shadowed ACEs that never match  
 
-- Apply standard ACLs as close to destination as possible
-- Configure more specific ACEs before less specific ones
-- Use descriptive names for named ACLs
-- Add remarks to document ACL purpose
-- Test ACLs in lab before production deployment
-- Document ACL requirements and configurations
-- Review ACLs regularly for effectiveness
-- Use named ACLs when editing is likely needed
-- Verify ACL placement and direction carefully
-- Consider implicit deny when designing ACLs
+### Troubleshooting steps
 
-## Summary
+1. Check ACL contents:
 
-- ACLs are ordered lists of rules that filter packets as they enter or exit router interfaces
-- Each ACL consists of Access Control Entries (ACEs) specifying matching conditions and actions
-- Packets evaluated sequentially from top to bottom; first match determines action
-- Permit action forwards packet; deny action discards packet
-- Implicit deny at end of every ACL denies all unmatched packets
-- Shadowed rules are ACEs that will never be acted upon due to preceding less specific rules
-- ACLs must be applied to interfaces in inbound or outbound direction to take effect
-- Standard ACLs match packets based only on source IP address
-- Numbered ACLs identified by number (standard: 1-99, 1300-1999)
-- Named ACLs identified by name and configured in separate config mode
-- Standard numbered ACLs configured with `access-list number {permit | deny} source-ip wildcard-mask`
-- Standard named ACLs created with `ip access-list standard name`, then ACEs configured in that mode
-- Wildcard masks indicate matching bits (0) and non-matching bits (1); inverse of netmasks
-- Sequence numbers automatically assigned (10, 20, 30, etc.) with default increment of 10
-- Apply ACLs with `ip access-group {number | name} {in | out}` in interface config mode
-- Standard ACLs should be applied as close to destination as possible
-- Use `show access-lists` and `show ip interface` to verify ACL configuration and application
+   ```cisco
+   show access-lists <number-or-name>
+   ```
 
+2. Confirm interface application:
+
+   ```cisco
+   show ip interface <name>
+   ```
+
+3. Review ACE order, placing more specific entries first  
+4. Correct wildcard masks where needed  
+5. Test with pings or traceroute and monitor ACL counters  
+
+## Quick review
+
+- Standard ACLs match on source IPv4 address only.  
+- ACLs are processed top to bottom and stop at the first match.  
+- Every ACL ends with an implicit `deny any`, so at least one permit is required.  
+- Standard ACLs are usually placed close to the destination they protect.  
+- Numbered standard ACLs use ranges 1–99 and 1300–1999.  
+- Named ACLs use `ip access-list standard <name>` and provide easier editing with sequence numbers.  
+- ACLs are applied to interfaces with `ip access-group <number-or-name> in | out`.  
+- Verification and troubleshooting rely on `show access-lists`, `show ip access-lists`, and `show ip interface`.  

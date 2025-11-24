@@ -2,234 +2,250 @@
 
 ## Overview
 
-IPv6 routing fundamentals are largely identical to IPv4 routing. Routers build routing tables, forward packets using longest prefix match, and can learn routes through static or dynamic routing. However, IPv6 uses Neighbor Discovery Protocol (NDP) instead of ARP for address resolution, and IPv6 static routing is the focus for CCNA exam (IPv6 dynamic routing is not included).
+IPv6 routing fundamentals match IPv4 routing. Routers build routing tables, forward packets using longest prefix match, and learn routes through connected, static, and dynamic methods. IPv6 uses Neighbor Discovery Protocol (NDP) instead of ARP for address resolution. For CCNA, static IPv6 routing and NDP behavior are the primary focus.
 
 ## Neighbor Discovery Protocol (NDP)
 
-### NDP Overview
+### NDP basics
 
 - IPv6 uses NDP instead of ARP for Layer 2 address resolution
-- NDP maps Layer 3 (IPv6) addresses to Layer 2 (MAC) addresses
-- NDP also provides additional functions: router discovery and duplicate address detection
-- NDP is component of ICMPv6 (ICMP for IPv6)
+- NDP maps IPv6 addresses to MAC addresses
+- NDP also supports router discovery and duplicate address detection
+- NDP is part of ICMPv6
 
-### Solicited-Node Multicast Addresses
+### Solicited node multicast addresses
 
-- Special multicast addresses used by some NDP functions
-- Generated from unicast address (global unicast, unique local, or link-local)
-- Generation: prepend ff02::1:ff to last six hexadecimal digits of unicast address
-- Example: 2001:db8:123::1 → ff02::1:ff00:1
-- Example: fe80::99ff:fe12:1234 → ff02::1:ff12:1234
+- Special multicast addresses used by NDP
+- Derived from a unicast address (global, unique local, or link local)
+- Creation rule: prepend `ff02::1:ff` to the last 24 bits of the unicast address
+- Examples:
+  - `2001:db8:123::1` → `ff02::1:ff00:1`
+  - `fe80::99ff:fe12:1234` → `ff02::1:ff12:1234`
 
-### Address Resolution
+### Address resolution
 
-- Uses two ICMPv6 messages:
-  - **Neighbor Solicitation (NS)**: ICMPv6 type 135 (equivalent to ARP request)
-  - **Neighbor Advertisement (NA)**: ICMPv6 type 136 (equivalent to ARP reply)
-- Process:
-  1. Host sends NS message to neighbor's solicited-node multicast address
-  2. Target neighbor replies with unicast NA message containing its MAC address
-- NS messages include Target Address field in payload to identify intended recipient
-- IPv6 neighbor table stores L3-L2 address mappings (view with `show ipv6 neighbors`)
+NDP uses two ICMPv6 message types for address resolution:
 
-### Router Discovery
+- Neighbor Solicitation (NS): type 135, similar role to ARP request
+- Neighbor Advertisement (NA): type 136, similar role to ARP reply
 
-- Allows hosts to automatically discover routers on local network
-- Also learns network characteristics (such as network prefix)
-- Uses two ICMPv6 messages:
-  - **Router Solicitation (RS)**: ICMPv6 type 133
-  - **Router Advertisement (RA)**: ICMPv6 type 134
-- RS messages sent to "all routers" multicast address (ff02::2)
-- RA messages sent to "all nodes" multicast address (ff02::1)
-- Routers send RA messages periodically, even without receiving RS
+Process:
+
+1. Host sends NS to the target's solicited node multicast address
+2. Target replies with a unicast NA that carries its MAC address
+3. IPv6 neighbor table stores the mapping, visible with `show ipv6 neighbors`
+
+### Router discovery
+
+Router discovery uses ICMPv6 messages:
+
+- Router Solicitation (RS): type 133, sent to `ff02::2` (all routers)
+- Router Advertisement (RA): type 134, sent to `ff02::1` (all nodes)
+
+Behavior:
+
+- Hosts send RS to discover routers and prefixes
+- Routers send RA periodically and in response to RS
+- RAs advertise prefixes and flags used for address configuration
 
 ### Stateless Address Autoconfiguration (SLAAC)
 
-- Allows host to automatically generate its own IPv6 address
-- Stateless: no central server tracking address assignments (unlike DHCP)
-- Process:
-  1. Host sends RS message
-  2. Router replies with RA message containing network prefix
-  3. Host combines learned prefix with Modified EUI-64 interface ID
-- Configure on Cisco router: `ipv6 address autoconfig`
-- `ipv6 address autoconfig default` also inserts default route using router's link-local address as next hop
+SLAAC allows a host to form its own IPv6 address without a stateful server.
+
+Basic flow:
+
+1. Host receives RA with prefix information
+2. Host combines advertised prefix with a 64 bit interface identifier (often EUI‑64 based)
+3. Host performs Duplicate Address Detection before using the address
+
+On Cisco routers:
+
+- `ipv6 address autoconfig` creates an address from RA information
+- `ipv6 address autoconfig default` also installs a default route using the router link local address as next hop
 
 ### Duplicate Address Detection (DAD)
 
-- Checks if IPv6 address is unique on network before host uses it
-- Performed whenever interface is configured with IPv6 address
-- Also performed when IPv6-enabled interface initializes (enters up/up state)
-- Process:
-  1. Host sends NS message to its own solicited-node multicast address
-  2. If no response after waiting period, address is unique
-  3. If NA message received in response, address is duplicate and cannot be used
-- Duplicate addresses marked as [DUP] in show commands
+DAD checks that an address is unique on the link before use.
 
-## IPv6 Routing Table
+- Performed when an interface gains an IPv6 address or transitions to up state
+- Host sends NS to its own solicited node multicast address
+- If no NA is received, the address is considered unique
+- If an NA is received, the address is marked duplicate and not used
+- Duplicate addresses appear with a [DUP] tag in some show outputs
 
-### Route Types
+## IPv6 routing table
 
-- **Connected routes**: Routes to networks interfaces are connected to
-  - Automatically added for each interface with IP address in up/up state
-  - Tell router to forward packets directly to destination host
-- **Local routes**: Routes to exact IP address configured on router's interface
-  - Automatically added for each IP address configured
-  - Tell router to receive packet for itself (continue de-encapsulation)
-- **Static routes**: Manually configured routes
-- **Dynamic routes**: Learned via routing protocols (not CCNA exam topic for IPv6)
+### Route types
 
-### Host Routes vs Network Routes
+Common IPv6 route types:
 
-- **Host route**: Route to single destination IP address
-  - IPv6 host routes use /128 prefix length
-  - Local routes are examples of host routes
-- **Network route**: Route to more than one destination IP address
-  - Any route with /127 or shorter prefix length
-  - Connected routes are examples of network routes
+- Connected routes
+  - Added automatically for each interface with an IPv6 address in up state
+  - Represent directly reachable networks
+- Local routes
+  - Added for each IPv6 address configured on an interface
+  - Represent the exact address on the router itself (/128)
+- Static routes
+  - Manually configured
+- Dynamic routes
+  - Learned with routing protocols (beyond CCNA scope for IPv6)
 
-### Link-Local Addresses in Routing Table
+### Host and network routes
 
-- Link-local addresses do not have connected or local routes
-- Traffic to/from link-local addresses doesn't need routing (never leaves local link)
-- Link-local addresses can be used as next-hop addresses in routes
-- Link-local addresses cannot be used as destination of routes
+- Host route
+  - Prefix length /128
+  - Matches a single address
+  - Local routes are host routes
+- Network route
+  - Prefix length /127 or shorter
+  - Matches a range of addresses
+  - Connected network routes are examples
 
-### Multicast Route
+### Link local addresses and routing
 
-- Router automatically inserts route to ff00::/8 (multicast address range)
-- Route specifies Null0 interface (packets dropped)
-- Prevents router from forwarding multicast packets by default
-- Does not prevent router from sending/receiving multicast packets (e.g., NDP)
+- Link local range: `fe80::/10`
+- Link local addresses never leave the local link
+- No connected or local routes appear for link local addresses
+- Link local addresses can be used as next hops in static routes
+- Link local addresses cannot be used as destination prefixes in routes
 
-### Route Selection
+### Multicast route entry
 
-- Router looks up packet's destination IP address in routing table
-- Selects most specific matching route (longest prefix match)
-- Same process as IPv4 routing
-- If no matching route, router drops packet
+- IPv6 routing table includes a route to `ff00::/8` pointing to Null0
+- This prevents forwarding of multicast packets by default
+- Router can still send and receive multicast packets on local interfaces
 
-## IPv6 Static Routes
+### Route selection
 
-### Static Route Types
+- IPv6 uses longest prefix match, same as IPv4
+- Router chooses the most specific route that matches the destination
+- If no route matches, the packet is dropped
 
-Three configuration methods:
+## IPv6 static routes
 
-1. **Recursive static route**: Specifies only next-hop IP address
-   - Command: `ipv6 route destination-prefix next-hop`
-   - Requires recursive routing table lookups to forward packet
-2. **Directly connected static route**: Specifies only exit interface
-   - Command: `ipv6 route destination-prefix exit-interface`
-   - **Does not work on Ethernet interfaces** (works on serial interfaces)
-   - IPv4 relies on proxy ARP; IPv6 has no equivalent proxy NDP
-3. **Fully specified static route**: Specifies both exit interface and next hop
-   - Command: `ipv6 route destination-prefix exit-interface next-hop`
-   - Preferred method for IPv6
+### Static route styles
 
-### Directly Connected Static Routes Limitation
+Three configuration patterns are important:
 
-- **Critical**: Directly connected IPv6 static routes do not work on Ethernet interfaces
-- Routes appear in routing table but communication will fail
-- Neighbor table shows INCMP (incomplete) entries
-- Works on serial interfaces (legacy point-to-point connections)
-- Must use fully specified routes on Ethernet interfaces
+1. Recursive static route
+   - Specifies only next hop address
+   - Form: `ipv6 route prefix next-hop`
+   - Router performs a lookup on the next hop address to find exit interface
 
-### Link-Local Next Hops
+2. Directly connected static route
+   - Specifies only exit interface
+   - Form: `ipv6 route prefix exit-interface`
+   - Valid on serial or point-to-point links
+   - Not usable on Ethernet segments
 
-- Link-local addresses can be used as next-hop addresses in routes
-- Packets sourced from/destined for link-local addresses are not routable
-- Link-local next hops work because address only used for immediate next hop on local link
-- **Routes with link-local next hops must be fully specified**
-- IOS will reject command if exit interface not specified
-- Transit links (links only carrying traffic between network parts) often use only link-local addresses
+3. Fully specified static route
+   - Specifies both exit interface and next hop
+   - Form: `ipv6 route prefix exit-interface next-hop`
+   - Recommended for IPv6, especially on Ethernet
 
-### Link-Local Address Uniqueness
+### Directly connected static route limitations
 
-- Link-local addresses must be unique only within context of single link
-- Same link-local address can be used on different interfaces (on separate links)
-- Allows identical link-local addresses on multiple interfaces of same router
-- Can manually configure link-local addresses: `ipv6 address address link-local`
+For IPv6 on Ethernet interfaces:
 
-### Default Routes
+- Static routes that specify only an exit interface appear in the routing table
+- Traffic using these routes often fails
+- Neighbor table shows incomplete (INCMP) entries
+- There is no IPv6 equivalent to proxy ARP to resolve the next hop
+- Use fully specified static routes on Ethernet instead
 
-- IPv6 default route is route to ::/0 (matches every possible IPv6 address)
-- Equivalent to 0.0.0.0/0 in IPv4
-- Most commonly used to provide route to internet
-- Logic: packets not matching internal destinations are forwarded to internet
-- Configure: `ipv6 route ::/0 next-hop` or `ipv6 route ::/0 exit-interface next-hop`
+### Link local next hops
 
-### Floating Static Routes
+- Link local addresses can serve as next hop addresses
+- These addresses are valid only on the local link
+- Static routes that use link local next hops must be fully specified
+- IOS requires an exit interface with a link local next hop
 
-- Static route configured with non-default administrative distance (AD)
-- Default AD for static routes is 1
-- Configure AD at end of command: `ipv6 route destination-prefix next-hop ad`
-- Example: `ipv6 route ::/0 2001:db8:1::2 2` (backup default route)
-- Floating route only enters routing table if more preferred route is removed
-- Used as backup routes
+Example:
 
-## Real-World Applications
+```cisco
+ipv6 route 2001:db8:10::/64 GigabitEthernet0/0 fe80::1
+```
 
-- **Enterprise networks**: IPv6 static routing for internal network connectivity
-- **Internet connectivity**: Default routes to ISPs for internet access
-- **Backup paths**: Floating static routes provide redundancy
-- **Transit links**: Link-local addressing sufficient for point-to-point connections
-- **Dual-stack networks**: Running IPv4 and IPv6 routing simultaneously
-- **Migration scenarios**: Static routes during IPv6 deployment
+Transit links that only carry traffic between routers often use link local only addressing, with static routes pointing to link local next hops.
 
-## Troubleshooting IPv6 Routing
+### Default route
 
-### Common Issues
+- IPv6 default route uses prefix `::/0`
+- Equivalent to `0.0.0.0/0` in IPv4
+- Commonly points toward an upstream router or ISP
 
-- **Routes not appearing**: Verify `ipv6 unicast-routing` is enabled
-- **Directly connected routes not working**: Remember they don't work on Ethernet interfaces
-- **Neighbor resolution failing**: Check NDP neighbor table with `show ipv6 neighbors`
-- **Link-local next hops**: Ensure routes are fully specified
-- **Duplicate addresses**: Check DAD status, verify no duplicate addresses
+Example:
 
-### Verification Commands
+```cisco
+ipv6 route ::/0 2001:db8:1::2
+```
 
-- `show ipv6 route`: View IPv6 routing table
-- `show ipv6 route connected`: View only connected routes
-- `show ipv6 route static`: View only static routes
-- `show ipv6 neighbors`: View IPv6 neighbor table (address resolution)
-- `show ipv6 interface brief`: View IPv6 addresses on interfaces
-- `ping [ipv6-address]`: Test IPv6 connectivity
+or with explicit exit interface:
 
-### Troubleshooting Steps
+```cisco
+ipv6 route ::/0 GigabitEthernet0/0 2001:db8:1::2
+```
 
-1. Verify IPv6 routing is enabled: `show ipv6 unicast-routing` or check config
-2. Check routing table: `show ipv6 route`
-3. Verify neighbor resolution: `show ipv6 neighbors`
-4. Test connectivity: `ping [destination]`
-5. Check interface status: `show ipv6 interface brief`
-6. Verify static route configuration: `show ipv6 route static`
+### Floating static routes
 
-## Best Practices
+- Static routes normally have administrative distance (AD) 1
+- Floating static routes use a higher AD to act as backups
+- Configured by adding AD at the end of the command
 
-- Always enable `ipv6 unicast-routing` before configuring IPv6 addresses
-- Use fully specified static routes on Ethernet interfaces
-- Use link-local addresses on transit links when global addresses not needed
-- Configure floating static routes for backup paths
-- Use default routes for internet connectivity
-- Verify neighbor resolution with `show ipv6 neighbors`
-- Test connectivity after configuring routes
-- Document IPv6 routing configuration
-- Plan for dual-stack operation during migration
+Example:
 
-## Summary
+```cisco
+ipv6 route ::/0 2001:db8:1::2 5
+```
 
-- IPv6 routing fundamentals are same as IPv4: routing tables, longest prefix match, static/dynamic routes
-- IPv6 uses NDP instead of ARP for address resolution
-- NDP uses Neighbor Solicitation (NS) and Neighbor Advertisement (NA) messages
-- Solicited-node multicast addresses generated by prepending ff02::1:ff to last six hex digits
-- NDP provides router discovery (RS/RA messages) and duplicate address detection (DAD)
-- SLAAC allows hosts to automatically generate IPv6 addresses using router advertisements
-- IPv6 routing table contains connected, local, static, and dynamic routes
-- Host routes use /128 prefix length; network routes use /127 or shorter
-- Link-local addresses don't have routes but can be used as next-hop addresses
-- IPv6 static routes: recursive (next-hop only), directly connected (exit interface only), fully specified (both)
-- **Directly connected IPv6 static routes do not work on Ethernet interfaces**
-- Routes with link-local next hops must be fully specified
-- Default route is ::/0 (equivalent to 0.0.0.0/0 in IPv4)
-- Floating static routes use non-default AD to provide backup paths
-- Use `show ipv6 route`, `show ipv6 neighbors`, and `ping` for troubleshooting
+- Route above is used only if no better route exists
+- Commonly used as backup default routes
 
+## Troubleshooting IPv6 routing
+
+### Common issues
+
+- IPv6 routing disabled
+  - `ipv6 unicast-routing` missing
+- Directly connected static routes on Ethernet
+  - Route present but traffic fails
+  - Neighbor table shows incomplete entries
+- Link local next hop errors
+  - Static route configured without exit interface
+- Duplicate or misconfigured addresses
+  - DAD failures, incorrect prefixes, or wrong interfaces
+
+### Verification commands
+
+- `show ipv6 route`
+  - Full IPv6 routing table
+- `show ipv6 route connected`
+  - Only connected routes
+- `show ipv6 route static`
+  - Only static routes
+- `show ipv6 neighbors`
+  - Neighbor table (similar to IPv4 ARP table)
+- `show ipv6 interface brief`
+  - Interfaces and IPv6 addresses
+- `ping ipv6 <address>` or `ping <address>`
+  - Connectivity tests
+
+Basic troubleshooting sequence:
+
+1. Confirm `ipv6 unicast-routing` is enabled
+2. Check interface status and addresses
+3. Verify presence of expected routes
+4. Check neighbor table for resolved next hops
+5. Test connectivity with `ping`
+
+## Quick review
+
+- IPv6 routing uses the same longest prefix match logic as IPv4.  
+- NDP replaces ARP and uses NS and NA messages for address resolution.  
+- RS and RA messages provide router discovery and support SLAAC.  
+- IPv6 routing tables contain connected, local, static, and dynamic routes.  
+- Host routes use /128; any shorter prefix describes a network.  
+- Link local addresses do not have routes but can be used as next hop addresses.  
+- Directly connected static routes are not reliable on Ethernet; fully specified static routes are preferred.  
+- Default route is `::/0` and floating static routes use higher administrative distance for backup.  
+- Core verification uses `show ipv6 route`, `show ipv6 neighbors`, `show ipv6 interface brief`, and `ping`.
