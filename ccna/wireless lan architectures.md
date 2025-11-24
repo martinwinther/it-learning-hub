@@ -531,4 +531,3 @@ In the previous chapter, we covered the basic building blocks of wireless LANs, 
 - Configuration, monitoring, and troubleshooting are all handled through cloud-based platform like Meraki dashboard
 - Cloud-based management solutions like Meraki offer simplicity, efficiency, and scalability that is beneficial for many modern enterprises
 - However, it might not be ideal for organizations with highly specialized or complex networking requirements
-

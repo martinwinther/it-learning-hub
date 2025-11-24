@@ -551,4 +551,3 @@ There are three main roles that routers can play in MPLS WAN:
 - End-user device runs piece of software called VPN client
 - Cisco's offering is called Cisco AnyConnect Secure Mobility Client, or just AnyConnect
 - This software allows device to create its own tunnel to company's firewall or router
-

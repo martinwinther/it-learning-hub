@@ -148,7 +148,7 @@ Over the past three chapters, we've covered the fundamentals of wireless LANs, s
 
 - Next up is RADIUS server configuration, which is necessary if using WPA-Enterprise authentication with 802.1X/EAP
 - CCNA exam topics state that you need to be able to configure PSK authentication (WPA-Personal), so type no here
-- Configure a RADIUS Server now? [YES][no]: no
+- Configure a RADIUS Server now? \[YES\]\[no\]: no
 - Wizard then prompts you for country code
 - This is necessary because, as we covered in chapter on wireless LAN fundamentals, different countries have different laws governing use of RF frequency bands
 - You might be tempted to enter country you live in, but if you bought secondhand hardware for home lab, need to make sure that country code you enter matches regulatory domain of APs you are using
@@ -160,10 +160,10 @@ Over the past three chapters, we've covered the fundamentals of wireless LANs, s
 
 - Following series of prompts asks if you want to enable each of series of 802.11 standards
 - Press Enter to accept default for each
-- Enable 802.11b Network [YES][no]:
-- Enable 802.11a Network [YES][no]:
-- Enable 802.11g Network [YES][no]:
-- Enable Auto-RF [YES][no]: Final Enable Auto-RF option allows WLC to automatically control each LWAP's transmit power and channel assignment—it's usually good idea to leave this on
+- Enable 802.11b Network \[YES\]\[no\]:
+- Enable 802.11a Network \[YES\]\[no\]:
+- Enable 802.11g Network \[YES\]\[no\]:
+- Enable Auto-RF \[YES\]\[no\]: Final Enable Auto-RF option allows WLC to automatically control each LWAP's transmit power and channel assignment—it's usually good idea to leave this on
 
 ### NTP Configuration
 
@@ -171,10 +171,10 @@ Over the past three chapters, we've covered the fundamentals of wireless LANs, s
 - In following prompts, specify SW1 as WLC1's NTP server
 - Configure its polling interval (how frequently WLC1 will query NTP server for time)
 - And then save configuration, causing WLC1 to reboot
-- Configure a NTP server now? [YES][no]:
+- Configure a NTP server now? \[YES\]\[no\]:
 - Enter NTP server's IP address: 192.168.1.1
 - Enter polling interval between 3600 and 604800 secs: 3600
-- Configuration correct? If yes, system will save it and reset. [yes][NO]: yes
+- Configuration correct? If yes, system will save it and reset. \[yes\]\[NO\]: yes
 
 ## WLC Management Access
 
@@ -597,4 +597,3 @@ Over the past three chapters, we've covered the fundamentals of wireless LANs, s
 - Discovery methods include broadcast discovery messages, previously joined WLCs, manual configuration, DHCP option 43, and DNS
 - Can configure AP's operational mode (local, FlexConnect, monitor, etc.) by clicking on AP name in Wireless tab
 - Can view list of wireless clients from Clients menu in Monitor tab
-

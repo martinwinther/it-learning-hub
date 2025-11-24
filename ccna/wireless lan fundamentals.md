@@ -215,14 +215,14 @@ It's time to break our communications out of their wired constraints and explore
 
 ## 2.4 GHz Band
 
-### Band Characteristics
+### 2.4 GHz Band Characteristics
 
 - 2.4 GHz band spans from 2.4 to 2.495 GHz and is widely used for wireless communications due to its lower frequency
 - Which enables better penetration through obstacles compared to 5 GHz and 6 GHz bands
 - However, this band is also used for other technologies, such as Bluetooth, microwave ovens, cordless telephones, and many others
 - This means that it can sometimes be crowded, leading to congestion and interference
 
-### Channels
+### 2.4 GHz Channels
 
 - 2.4 GHz band is divided into 14 individual channels
 - Like band, channel is specific range of frequencies—can think of channel as smaller division of band
@@ -252,7 +252,7 @@ It's time to break our communications out of their wired constraints and explore
 
 ## 5 GHz Band
 
-### Band Characteristics
+### 5 GHz Band Characteristics
 
 - 5 GHz band, ranging from approximately 5.150 to 5.895 GHz (depending on country), is second frequency band widely used for wireless LANs
 - Compared to 2.4 GHz band, 5 GHz is generally less crowded and not as prone to interference from common household devices
@@ -261,7 +261,7 @@ It's time to break our communications out of their wired constraints and explore
 - On upside, it means that 5 GHz signals from neighboring rooms and buildings are less likely to cause interference
 - On downside, this can limit coverage area of 5 GHz signals
 
-### Channels
+### 5 GHz Channels
 
 - Unlike 2.4 GHz band, channels in 5 GHz band are non-overlapping when using standard 20 MHz width
 - Which simplifies channel selection process when setting up multiple wireless access points
@@ -274,7 +274,7 @@ It's time to break our communications out of their wired constraints and explore
 
 ## 6 GHz Band
 
-### Band Characteristics
+### 6 GHz Band Characteristics
 
 - 6 GHz band is newest addition to 802.11 wireless LAN frequency bands
 - Ranging from 5.925 GHz to 7.125 GHz (notably, its low and high ends are both beyond 6 GHz range)
@@ -614,4 +614,3 @@ It's time to break our communications out of their wired constraints and explore
 - Wired device connects to WGB via Ethernet cable, and WGB functions as client of main AP on behalf of wired device
 - APs operating as outdoor bridges can be used to connect geographically separated LANs wirelessly without need for physical cabling
 - Outdoor bridges use directional antennas to focus wireless signal, allowing signal's strength to be maintained over longer distances than normally possible
-

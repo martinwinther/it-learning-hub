@@ -341,4 +341,3 @@ Cisco campus LANs use hierarchical design, dividing network into three modular l
 - It's common for all networking functions in SOHO network to be provided by single wireless router (also called Wi-Fi router or home router)
 - Wireless router combines functions of various network devices into one: router, switch, firewall, wireless access point, and sometimes modem (modulator-demodulator)
 - Most SOHO networks prioritize cost savings with single router and internet connection, trading off redundancy found in enterprise networks
-

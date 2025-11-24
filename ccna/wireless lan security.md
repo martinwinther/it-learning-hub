@@ -194,7 +194,7 @@ Imagine that you are in a room full of people. You have to communicate a private
 - Granting attacker access to LAN
 - Outside of SOHO networks, it's best to opt for more secure option: WPA-Enterprise
 
-### Exam Focus
+### WPA3-Personal Exam Focus
 
 - For CCNA exam, know that WPA-Personal authentication involves configuring shared passphrase (which generates PSK)
 - And that WPA3 uses SAE to protect PSK against brute-force attacks
@@ -248,7 +248,7 @@ Imagine that you are in a room full of people. You have to communicate a private
 - Regardless of which EAP method is used, same four-way handshake that we outlined in WPA-Personal section is always used after authentication to generate encryption keys used to encrypt/decrypt data messages
 - This handshake is done between supplicant and authenticator (client and AP/WLC)
 
-### Exam Focus
+### WPA-Enterprise Exam Focus
 
 - For CCNA exam, should understand basics of 802.1X (supplicant, authenticator, AS), EAP, and RADIUS
 - EAPoL carries EAP messages between supplicant and authenticator
@@ -464,4 +464,3 @@ Imagine that you are in a room full of people. You have to communicate a private
 - GCMP is more secure and more efficient than CCMP, which is necessary for encryption to keep up with faster data rates of latest 802.11 standards
 - Like CCMP, GCMP uses AES counter mode encryption, although it supports greater key lengths (128 bits or 256 bits) than CCMP (128 bits)
 - GCMP uses Galois Message Authentication Code (GMAC) for its data integrity checksum
-

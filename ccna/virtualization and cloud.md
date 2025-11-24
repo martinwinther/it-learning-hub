@@ -595,4 +595,3 @@ Virtualization and cloud computing are two technologies that have transformed mo
 - Community cloud is collaborative effort where cloud infrastructure is reserved for use by consumers in multiple organizations
 - Infrastructure can be managed by one or more of member organizations or third party and can exist on or off premises of any of member organizations
 - Hybrid cloud is combination of two or more of other deployment models (for example, private cloud that can offload work to public cloud when necessary)
-
