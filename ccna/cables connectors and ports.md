@@ -106,13 +106,13 @@ Real networks often deploy Cat 5e, Cat 6, or Cat 6a for new installations.
 
 For 10BASE-T and 100BASE-T, only two pairs carry data.
 
-**Straight-through cable**
+### Straight-through cable
 
 - Pins 1 and 2 on one end connect to pins 1 and 2 on the other
 - Pins 3 and 6 on one end connect to pins 3 and 6 on the other
 - Used between different device types (PC to switch, router to switch)
 
-**Crossover cable**
+### Crossover cable
 
 - Pins 1 and 2 on one end connect to pins 3 and 6 on the other end
 - Swaps transmit and receive pairs
@@ -193,13 +193,13 @@ SMF supports longer distances than MMF but with higher optics cost.
 
 ### Typical usage
 
-**UTP use cases**
+#### UTP use cases
 
 - End host to access switch
 - Short runs in offices and wiring closets
 - Most client devices have only RJ45 copper ports
 
-**Fiber use cases**
+#### Fiber use cases
 
 - Switch to switch uplinks
 - Links between floors and buildings

@@ -421,4 +421,3 @@ Requirements that must be unique:
 - Network types control DR/BDR elections and adjacency behavior on each segment.  
 - Neighbor formation requires matching parameters such as area, timers, authentication, MTU, and network type, with unique RIDs.  
 - Core verification uses `show ip protocols`, `show ip ospf interface`, `show ip ospf neighbor`, `show ip route ospf`, and `show ip ospf database`.
-

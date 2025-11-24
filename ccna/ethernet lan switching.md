@@ -284,4 +284,4 @@ These commands help confirm VLAN membership, trunk status, STP state, and learne
 - Access ports carry one VLAN. Trunk ports carry multiple VLANs with 802.1Q tags and a native VLAN.
 - STP prevents Layer 2 loops by blocking some ports and electing a root bridge.
 - Basic switch security features include port security, DHCP snooping, and Dynamic ARP Inspection.
-- Core troubleshooting uses show commands to check MAC tables, VLANs, interfaces, and STP.  
+- Core troubleshooting uses show commands to check MAC tables, VLANs, interfaces, and STP.

@@ -309,4 +309,3 @@ switchport port-security violation {shutdown | restrict | protect}
 - Violation modes shutdown, restrict, and protect differ in how they block traffic and how much visibility they provide.  
 - Secure MAC address aging can be configured with absolute or inactivity timers and can optionally apply to static entries.  
 - Sticky MAC learning provides an easy way to persist dynamically learned secure MAC addresses across interface down events.
-

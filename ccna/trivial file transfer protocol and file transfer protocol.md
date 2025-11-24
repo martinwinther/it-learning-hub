@@ -1,4 +1,3 @@
-```markdown
 # Trivial File Transfer Protocol and File Transfer Protocol
 
 ## Overview
@@ -281,5 +280,4 @@ Once the new image is stable in production, old images in flash can be removed w
 - The `copy source destination` command copies files between local file systems and TFTP or FTP servers.  
 - FTP uses TCP with separate control (port 21) and data connections and supports directory and file management commands.  
 - IOS can act as an FTP client using stored credentials or URLs with embedded username and password.  
-- IOS upgrades involve copying a new image, pointing the boot system to that image, saving the configuration, reloading, verifying the version, and optionally deleting old images.  
-```
+- IOS upgrades involve copying a new image, pointing the boot system to that image, saving the configuration, reloading, verifying the version, and optionally deleting old images.

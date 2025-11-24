@@ -294,4 +294,3 @@ Lower numeric values indicate more severe events.
 - Severity levels run from 0 (emergencies) to 7 (debugging), and destinations log events at their configured level and more severe levels.  
 - `service timestamps log` and `service sequence-numbers` improve message correlation.  
 - Debug messages use severity level 7 and are controlled with `debug` and `no debug all`.  
-

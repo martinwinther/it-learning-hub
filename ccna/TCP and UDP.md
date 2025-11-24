@@ -162,7 +162,7 @@ TCP features introduce overhead:
 
 ## User Datagram Protocol (UDP)
 
-### Key characteristics
+### UDP key characteristics
 
 - Connectionless  
 - No sequencing  
@@ -255,5 +255,4 @@ Useful commands include:
 - TCP is connection oriented, reliable, and uses sequencing and flow control at the cost of additional overhead.  
 - UDP is connectionless, has minimal overhead, and relies on applications to handle any required reliability.  
 - TCP is used for applications that need accurate, complete delivery, while UDP is used where delay must stay low and some loss is acceptable.  
-- Session multiplexing relies on the five tuple: source and destination addresses, ports, and transport protocol.  
-
+- Session multiplexing relies on the five tuple: source and destination addresses, ports, and transport protocol.

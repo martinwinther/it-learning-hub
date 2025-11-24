@@ -139,7 +139,7 @@ Common types:
 
 ## Social engineering
 
-### Overview
+### Social engineering overview
 
 - Targets human behavior rather than software or hardware.  
 - Aims to trick individuals into revealing information or performing actions.  
@@ -328,30 +328,30 @@ Security programs treat social engineering as a major risk and rely on awareness
 ### Main differences
 
 - Operation:
-    - RADIUS combines authentication and authorization.  
-    - TACACS+ keeps authentication, authorization, and accounting separate.
+  - RADIUS combines authentication and authorization.  
+  - TACACS+ keeps authentication, authorization, and accounting separate.
 
 - Transport:
-    - RADIUS uses UDP (ports 1812 and 1813).  
-    - TACACS+ uses TCP (port 49).
+  - RADIUS uses UDP (ports 1812 and 1813).  
+  - TACACS+ uses TCP (port 49).
 
 - Encryption:
-    - RADIUS encrypts only the password field.  
-    - TACACS+ encrypts the entire payload.
+  - RADIUS encrypts only the password field.  
+  - TACACS+ encrypts the entire payload.
 
 ### Common use cases
 
 - TACACS+  
-    - Often used for device administration.  
-    - Provides granular control of which commands are permitted.
+  - Often used for device administration.  
+  - Provides granular control of which commands are permitted.
 
 - RADIUS  
-    - Often used for network access control (VPN, Wi-Fi, 802.1X).  
-    - Simpler and efficient where detailed command control is not required.
+  - Often used for network access control (VPN, Wi-Fi, 802.1X).  
+  - Simpler and efficient where detailed command control is not required.
 
 ## 802.1X
 
-### Overview
+### 802.1X overview
 
 - IEEE 802.1X provides port based network access control.  
 - Controls access to a LAN or WLAN before full network connectivity is granted.
@@ -383,9 +383,9 @@ Security programs treat social engineering as a major risk and rely on awareness
 - Each packet is evaluated independently with no awareness of previous packets.
 
 - Stateful firewalls:
-    - Track sessions and connection states.  
-    - Allow return traffic for sessions initiated from trusted zones.  
-    - Provide more context aware control.
+  - Track sessions and connection states.  
+  - Allow return traffic for sessions initiated from trusted zones.  
+  - Provide more context aware control.
 
 ### Firewall zones
 
@@ -396,14 +396,14 @@ Security programs treat social engineering as a major risk and rely on awareness
 ### Next generation firewalls (NGFW)
 
 - Extend stateful inspection with additional features such as:
-    - Application Visibility and Control (AVC)  
-      Identifies traffic by application, not just port and protocol.
+  - Application Visibility and Control (AVC)  
+    Identifies traffic by application, not just port and protocol.
 
-    - Advanced Malware Protection (AMP)  
-      Integrates anti malware scanning.
+  - Advanced Malware Protection (AMP)  
+    Integrates anti malware scanning.
 
-    - Intrusion Prevention System (IPS)  
-      Uses signatures and behavior analysis to detect and block attacks.
+  - Intrusion Prevention System (IPS)  
+    Uses signatures and behavior analysis to detect and block attacks.
 
 ### Next generation IPS (NGIPS)
 
@@ -422,4 +422,3 @@ Security programs treat social engineering as a major risk and rely on awareness
 - AAA with RADIUS and TACACS+ centralizes authentication, authorization, and accounting.  
 - 802.1X integrates with RADIUS to enforce port based network access control.  
 - Firewalls, NGFW features, and IPS/NGIPS provide layered network protection beyond basic ACLs.
-

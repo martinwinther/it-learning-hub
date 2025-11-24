@@ -243,7 +243,7 @@ VMs and containers solve different problems and both are common in modern enviro
 
 ## Cloud service models
 
-### Overview
+### Service models overview
 
 Cloud providers offer different layers of service. The main models are Software as a Service, Platform as a Service, and Infrastructure as a Service.
 

@@ -178,7 +178,7 @@ Each /25 subnet has 126 usable addresses.
 
 ## Variable Length Subnet Masking (VLSM)
 
-### Concept
+### VLSM concept
 
 Variable Length Subnet Masking uses different prefix lengths within a single address block. Subnets are sized to match actual requirements. VLSM is standard practice in real networks.
 
@@ -272,4 +272,4 @@ Remaining addresses: 10.89.100.243–10.89.100.255.
 - Subnet masks use 1s for network bits and 0s for host bits; common masks from /24 to /30 should be memorized.  
 - /31 is efficient for point to point links and /32 represents a single host route.  
 - FLSM uses equal sized subnets with the same prefix length; VLSM uses different prefix lengths to match real host requirements.  
-- Typical exam problems involve calculating subnet ranges, host counts, and choosing appropriate prefixes for given host requirements.  
+- Typical exam problems involve calculating subnet ranges, host counts, and choosing appropriate prefixes for given host requirements.

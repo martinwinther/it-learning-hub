@@ -267,4 +267,3 @@ Combined with `ping` and `traceroute`, these commands help confirm that addresse
 - PAT (NAT overload) lets many private hosts share one or a few public addresses by translating ports.  
 - NAT configuration always marks inside and outside interfaces and then defines static, dynamic, or PAT rules.  
 - Core verification uses `show ip nat translations`, `show ip nat statistics`, and interface and ACL checks.
-

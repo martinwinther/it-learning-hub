@@ -281,4 +281,3 @@ AF decimal calculation shortcut:
 - Policing drops or re marks traffic above a rate; shaping buffers excess traffic to smooth the rate.  
 - RED and WRED perform early drops to avoid full queues and TCP global synchronization.  
 - Per hop behavior means each device must be configured to honor markings for end to end QoS to work.
-

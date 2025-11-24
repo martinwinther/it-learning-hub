@@ -156,7 +156,7 @@ Information stored per entry:
 - Interface
 - Lease information
 
-### Verification
+### Binding table verification
 
 Command:
 
@@ -210,11 +210,11 @@ For CCNA, remember that option 82 can break DHCP when snooping is enabled and th
 
 ## DHCP snooping rate limiting
 
-### Purpose
+### Rate limiting purpose
 
 Inspecting DHCP messages consumes CPU resources. A flood of DHCP traffic can be used as a denial-of-service attack against the switch. DHCP snooping rate limiting reduces this risk.
 
-### Configuration
+### Rate limiting configuration
 
 Interface command:
 

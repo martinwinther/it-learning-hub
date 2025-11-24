@@ -212,7 +212,7 @@ These effects shape WLAN coverage and performance.
 
 ## 5 GHz band
 
-### Band characteristics
+### 5 GHz band characteristics
 
 - Frequency range approximately 5.150 to 5.895 GHz (varies by country).
 - Shorter range and less wall penetration than 2.4 GHz.
@@ -230,7 +230,7 @@ These effects shape WLAN coverage and performance.
 
 ## 6 GHz band
 
-### Band characteristics
+### 6 GHz band characteristics
 
 - Frequency range roughly 5.925 to 7.125 GHz.
 - Newest band for 802.11 WLANs.

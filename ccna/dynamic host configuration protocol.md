@@ -252,4 +252,3 @@ These commands show IP address, mask, gateway, DHCP status, and DNS information.
 - Address conflict detection pings candidate addresses and tracks conflicts with `show ip dhcp conflict`.
 - A router can act as a DHCP client with `ip address dhcp` and as a DHCP relay with `ip helper-address`.
 - Client OS tools such as `ipconfig`, `ifconfig`, and `ip addr` reveal DHCP learned settings for verification.
-
