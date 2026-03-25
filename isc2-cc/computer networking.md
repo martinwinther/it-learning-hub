@@ -93,7 +93,7 @@ Application layer.
 
 #### 2. Data-Link Layer
 
-- **Function**: Transfers data between two nodes on the same physical network
+- **Function**: Transfers data between two nodes on the same physical network, also checks recieved data for corruption.
 - **Components**: Switches, network interface cards
 - **Protocols**: Ethernet, Wi-Fi, PPP
 - **Security**: MAC address filtering, VLANs
